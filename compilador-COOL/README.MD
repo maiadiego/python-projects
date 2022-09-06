@@ -1,5 +1,5 @@
-link documentação PLY: https://ply.readthedocs.io/en/latest/ply.html#yacc
+Link documentação PLY: https://ply.readthedocs.io/en/latest/ply.html#yacc
 
-link artigo sobre expressões regulares: https://pt.wikipedia.org/wiki/Express%C3%A3o_regular#Uso
+Link artigo sobre expressões regulares: https://pt.wikipedia.org/wiki/Express%C3%A3o_regular#Uso
 
-consulta rápida ao módulo re do Python que é usado para escrever as expressões regulares: https://www.w3schools.com/python/python_regex.asp
+Consulta rápida ao módulo re do Python que é usado para escrever as expressões regulares: https://www.w3schools.com/python/python_regex.asp
