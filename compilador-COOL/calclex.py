@@ -13,7 +13,13 @@ tokens = (
     'COMMA',
     'DOTCOMMA',
     'DOUBLEDOT',
-    'ARROW'
+    'ARROW',
+    'EQ',
+    'NEQ',
+    'GT',
+    'LT',
+    'GE',
+    'LE'
 )
 
 reserved = {
@@ -47,14 +53,22 @@ t_DIVIDE  = r'/'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 
-t_COMMA = r'\,'
-t_DOTCOMMA = r'\;'
-t_DOUBLEDOT = r'\:'
+t_COMMA = r','
+t_DOTCOMMA = r';'
+t_DOUBLEDOT = r':'
 t_ARROW = r'<-'     # não sei se é assim pra representar '<-'
+t_EQ = r'='
+t_NEQ = r'!='
+t_GT = r'>'
+t_LT = r'<'
+t_GE = r'>='
+t_LE = r'<='
 
 
-tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'LPAREN', 'RPAREN', 
-          'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 'ID'] + list(reserved.values())
+tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 
+          'TIMES', 'DIVIDE', 'LPAREN', 'RPAREN', 
+          'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
+          'EQ', 'NEQ', 'GT', 'LT', 'GE', 'LE', 'ID'] + list(reserved.values())
 
 # A regular expression rule with some action code
 def t_ID(t):
@@ -66,6 +80,11 @@ def t_ID(t):
 def t_NUMBER(t):
     r'\d+'      # docstring retém a expressão regular     # casa digitos de 0 a 9? oq o '+' significa?
     t.value = int(t.value)
+    return t
+
+
+def t_STRING(t):
+    r'("[^"\n]*")' # corresponde a quaisquer strings literais entre aspas duplas 
     return t
 
 
@@ -118,14 +137,23 @@ def t_error(t):
     t.lexer.skip(1)
 
 
+def test_lex():
+
+    # aqui precisamos dar um jeito de ler um arquivo cool
+
+    lex.input("x = 3 * 4 + (5 * 6)")
+
+    while True: 
+        tok = lex.token()
+        if not tok: 
+            break
+        print(tok)
+        #print(tok.type, tok.value, tok.lineno, tok.lexpos)
+
+
 # Build the lexer
-lexer = lex.lex()  # constrói o lexer criando uma expressão regular geral
-lexer.input("x = 3 * 4 + (5 * 6)")
-while True: 
-    tok = lex.token()
-    if not tok: 
-        break
-    print(tok)
-    #print(tok.type, tok.value, tok.lineno, tok.lexpos)
+lex.lex()  # constrói o lexer criando uma expressão regular geral
 
 
+if __name__ == '__main__':
+    test_lex()
