@@ -1,4 +1,5 @@
 import ply.lex as lex
+import sys
 
 
 tokens = (
@@ -19,7 +20,8 @@ tokens = (
     'GT',
     'LT',
     'GE',
-    'LE'
+    'LE',
+    'STRING'
 )
 
 reserved = {
@@ -45,7 +47,6 @@ reserved = {
 }
 
 # Regular expression rules for simple tokens
-#t_ignore = ' \t'    # especifica caracteres ignorados entre tokes, usualmente espaços em branco e tabs
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
@@ -56,19 +57,19 @@ t_RPAREN  = r'\)'
 t_COMMA = r','
 t_DOTCOMMA = r';'
 t_DOUBLEDOT = r':'
-t_ARROW = r'<-'     # não sei se é assim pra representar '<-'
+t_ARROW = r'<-'     
 t_EQ = r'='
 t_NEQ = r'!='
 t_GT = r'>'
 t_LT = r'<'
-t_GE = r'>='
+t_GE = r'>='    # acho que não tem no cool
 t_LE = r'<='
 
 
 tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 
           'TIMES', 'DIVIDE', 'LPAREN', 'RPAREN', 
           'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
-          'EQ', 'NEQ', 'GT', 'LT', 'GE', 'LE', 'ID'] + list(reserved.values())
+          'EQ', 'NEQ', 'GT', 'LT', 'GE', 'LE', 'STRING', 'ID'] + list(reserved.values())
 
 # A regular expression rule with some action code
 def t_ID(t):
@@ -97,7 +98,9 @@ def t_COMMENT(t):
 
 
 # Define a rule so we can track line numbers
-def t_newline(t):       # o que são line numbers?
+# O lex.py não sabe o que constitui uma "linha" de entrada
+# Então é preciso criar uma regra para lidar com esse caso  
+def t_newline(t):       
     r'\n+'
     t.lexer.lineno += len(t.value)
 
@@ -137,11 +140,13 @@ def t_error(t):
     t.lexer.skip(1)
 
 
-def test_lex():
+# Build the lexer
+lex.lex()  # constrói o lexer criando uma expressão regular geral
 
-    # aqui precisamos dar um jeito de ler um arquivo cool
+if __name__ == '__main__':
 
-    lex.input("x = 3 * 4 + (5 * 6)")
+    code = open(sys.argv[1], "r").read()    # passar o nome do arquivo via linha de comando
+    lex.input(code)
 
     while True: 
         tok = lex.token()
@@ -149,11 +154,3 @@ def test_lex():
             break
         print(tok)
         #print(tok.type, tok.value, tok.lineno, tok.lexpos)
-
-
-# Build the lexer
-lex.lex()  # constrói o lexer criando uma expressão regular geral
-
-
-if __name__ == '__main__':
-    test_lex()
