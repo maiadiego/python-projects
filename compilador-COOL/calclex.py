@@ -10,16 +10,12 @@ tokens = (
     'DIVIDE',
     'LPAREN',
     'RPAREN',
-    
     'COMMA',
     'DOTCOMMA',
     'DOUBLEDOT',
     'ARROW',
     'EQ',
-    'NEQ',
-    'GT',
     'LT',
-    'GE',
     'LE',
     'STRING'
 )
@@ -38,8 +34,8 @@ reserved = {
    'new': 'NEW',
    'of': 'OF',
    'not': 'NOT',
-   'false': 'false',        ## obs: true e false são case sensitive, apenas a primeira letra precisa
-   'true':'true',           # ser minúscula. Como seria isso no código?
+   'false': 'FALSE',       
+   'true':'TRUE',          
    'if' : 'IF',
    'then' : 'THEN',
    'else' : 'ELSE',
@@ -53,25 +49,19 @@ t_TIMES   = r'\*'
 t_DIVIDE  = r'/'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
-
 t_COMMA = r','
 t_DOTCOMMA = r';'
 t_DOUBLEDOT = r':'
 t_ARROW = r'<-'     
 t_EQ = r'='
-t_NEQ = r'!='
-t_GT = r'>'
 t_LT = r'<'
-t_GE = r'>='    # acho que não tem no cool
 t_LE = r'<='
 
 
 tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 
-          'TIMES', 'DIVIDE', 'LPAREN', 'RPAREN', 
-          'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
-          'EQ', 'NEQ', 'GT', 'LT', 'GE', 'LE', 'STRING', 'ID'] + list(reserved.values())
+          'TIMES', 'DIVIDE', 'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
+          'EQ', 'LT', 'LE', 'STRING', 'ID'] + list(reserved.values())
 
-# A regular expression rule with some action code
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
@@ -79,7 +69,7 @@ def t_ID(t):
 
 
 def t_NUMBER(t):
-    r'\d+'      # docstring retém a expressão regular     # casa digitos de 0 a 9? oq o '+' significa?
+    r'\d+'      # docstring retém a expressão regular   
     t.value = int(t.value)
     return t
 
@@ -90,11 +80,8 @@ def t_STRING(t):
 
 
 def t_COMMENT(t):
-    # comentários em cool: -- e *...* 
-    r'\--.*'   
-    r'\**.*'   # não sei se esse padrão de reconhecer esse tipo de comentário funciona
+    r'(?:--[^\n]*) | (\(\*(.|\n)*?\*\))'
     pass
-    # No return value. Token discarded
 
 
 # Define a rule so we can track line numbers
@@ -108,7 +95,7 @@ def t_newline(t):
 # Compute column.
 #     input is the input text string
 #     token is a token instance
-def find_column(input, token):  # não entendi mt bem a utilidade dessa função
+def find_column(input, token):  
     line_start = input.rfind('\n', 0, token.lexpos) + 1    
     return (token.lexpos - line_start) + 1
 
@@ -123,29 +110,27 @@ literals = [ '{', '}' ]
 
 def t_lbrace(t):
     r'\{'
-    t.type = '{'      # Set token type to the expected literal
+    t.type = '{'      
     return t
 
 
 def t_rbrace(t):
     r'\}'
-    t.type = '}'      # Set token type to the expected literal
+    t.type = '}'      
     return t
 
 
-# Error handling rule: lidar com strings que não forem tokenizadas, isto é, não possuem regra de
-# reconhecimento 
+# Lidar com strings que não forem tokenizadas, isto é, não possuem regra de reconhecimento 
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
 
-# Build the lexer
-lex.lex()  # constrói o lexer criando uma expressão regular geral
+# Constrói o lexer criando uma expressão regular geral
+lex.lex()   
 
 if __name__ == '__main__':
-
-    code = open(sys.argv[1], "r").read()    # passar o nome do arquivo via linha de comando
+    code = open(sys.argv[1], "r").read()    
     lex.input(code)
 
     while True: 
