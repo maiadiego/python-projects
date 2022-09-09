@@ -8,6 +8,7 @@ tokens = (
     'MINUS',
     'TIMES',
     'DIVIDE',
+    'COMPLEMENT',
     'LPAREN',
     'RPAREN',
     'COMMA',
@@ -47,6 +48,7 @@ t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
 t_DIVIDE  = r'/'
+t_COMPLEMENT = r'~'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_COMMA = r','
@@ -59,7 +61,7 @@ t_LE = r'<='
 
 
 tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 
-          'TIMES', 'DIVIDE', 'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
+          'TIMES', 'DIVIDE', 'COMPLEMENT', 'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
           'EQ', 'LT', 'LE', 'STRING', 'ID'] + list(reserved.values())
 
 def t_ID(t):
@@ -80,7 +82,10 @@ def t_STRING(t):
 
 
 def t_COMMENT(t):
-    r'(?:--[^\n]*) | (\(\*(.|\n)*?\*\))'
+    r'\--.* | \(\*(.|\n)*\*\)'
+    occurrencies = t.value.count('\n')
+    #print(occurrencies)
+    t.lexer.lineno += occurrencies
     pass
 
 
