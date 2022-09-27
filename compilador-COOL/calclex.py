@@ -52,21 +52,28 @@ t_COMPLEMENT = r'~'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_COMMA = r','
+t_DOT = r'\.'
 t_DOTCOMMA = r';'
 t_DOUBLEDOT = r':'
-t_ARROW = r'<-'     
+t_ARROW = r'<-'
+t_AT = r'\@'     
 t_EQ = r'='
 t_LT = r'<'
 t_LE = r'<='
 
 
-tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 
-          'TIMES', 'DIVIDE', 'COMPLEMENT', 'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 
+tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 'NOT', 'TYPE', 
+          'TIMES', 'DIVIDE', 'COMPLEMENT', 'COMMA', 'DOT', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 'AT', 
           'EQ', 'LT', 'LE', 'STRING', 'ID'] + list(reserved.values())
 
 def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value,'ID')    # Check for reserved words
+    r'[a-z][A-Za-z0-9_]*'
+    t.type = reserved.get(t.value.lower(), 'ID') 
+    return t
+
+
+def t_TYPE(t):
+    r'[A-Z][A-Za-z0-9_]*'
     return t
 
 
@@ -87,6 +94,11 @@ def t_COMMENT(t):
     #print(occurrencies)
     t.lexer.lineno += occurrencies
     pass
+
+
+def t_NOT(t):
+    r'[nN][oO][tT]'
+    return t
 
 
 # Define a rule so we can track line numbers
@@ -111,7 +123,7 @@ t_ignore  = ' \t'   # provides substantially better lexing performance because
                     # more efficient manner than the normal regular expression rules.
 
 
-literals = [ '{', '}' ]
+literals = ['+', '-', '*', '/', ':', ';', '(', ')', '{', '}', '@', '.', ',','=','<']
 
 def t_lbrace(t):
     r'\{'
@@ -138,7 +150,7 @@ if __name__ == '__main__':
     code = open(sys.argv[1], "r").read()    
     lex.input(code)
 
-    while True: 
+    while True:     
         tok = lex.token()
         if not tok: 
             break
