@@ -2,25 +2,6 @@ import ply.lex as lex
 import sys
 
 
-tokens = (
-    'NUMBER',
-    'PLUS',
-    'MINUS',
-    'TIMES',
-    'DIVIDE',
-    'COMPLEMENT',
-    'LPAREN',
-    'RPAREN',
-    'COMMA',
-    'DOTCOMMA',
-    'DOUBLEDOT',
-    'ARROW',
-    'EQ',
-    'LT',
-    'LE',
-    'STRING'
-)
-
 reserved = {
    'class': 'CLASS',
    'fi': 'FI',
@@ -43,28 +24,32 @@ reserved = {
    'while' : 'WHILE',
 }
 
-# Regular expression rules for simple tokens
+tokens = ['LPAREN','RPAREN','LBRACE', 'RBRACE', 'DOUBLEDOT', 'COMMA', 'DOT', 'DOTCOMMA', 'AT',
+          'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EQ', 'LT', 'LE', 'ARROW', 'COMPLEMENT', 'NOT',
+          'INTEGER', 'STRING', 'BOOL',
+          'TYPE', 'ID',
+          'EL'] + list(reserved.values())
+
+t_LPAREN  = r'\('
+t_RPAREN  = r'\)'
+t_LBRACE = r'\{'       
+t_RBRACE = r'\}'
+t_DOUBLEDOT = r':'
+t_COMMA = r','
+t_DOT = r'\.'
+t_DOTCOMMA = r';'
+t_AT = r'\@' 
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
 t_DIVIDE  = r'/'
-t_COMPLEMENT = r'~'
-t_LPAREN  = r'\('
-t_RPAREN  = r'\)'
-t_COMMA = r','
-t_DOT = r'\.'
-t_DOTCOMMA = r';'
-t_DOUBLEDOT = r':'
-t_ARROW = r'<-'
-t_AT = r'\@'     
 t_EQ = r'='
 t_LT = r'<'
 t_LE = r'<='
+t_EL = r'\=\>'  
+t_ARROW = r'<-'
+t_COMPLEMENT = r'~'
 
-
-tokens = ['LPAREN','RPAREN','NUMBER', 'PLUS', 'MINUS', 'NOT', 'TYPE', 
-          'TIMES', 'DIVIDE', 'COMPLEMENT', 'COMMA', 'DOT', 'DOTCOMMA', 'DOUBLEDOT', 'ARROW', 'AT', 
-          'EQ', 'LT', 'LE', 'STRING', 'ID'] + list(reserved.values())
 
 def t_ID(t):
     r'[a-z][A-Za-z0-9_]*'
@@ -77,15 +62,21 @@ def t_TYPE(t):
     return t
 
 
-def t_NUMBER(t):
-    r'\d+'      # docstring retém a expressão regular   
+def t_STRING(t):
+    r'("[^"\n]*")' # corresponde a quaisquer strings literais entre aspas duplas 
+    return t
+
+
+def t_INTEGER(t):
+    r'[0-9]+'
     t.value = int(t.value)
     return t
 
 
-def t_STRING(t):
-    r'("[^"\n]*")' # corresponde a quaisquer strings literais entre aspas duplas 
-    return t
+def t_BOOL(t):
+    r'true|false'
+    t.value = True if t.value == 'true' else False
+    return 
 
 
 def t_COMMENT(t):
@@ -123,25 +114,13 @@ t_ignore  = ' \t'   # provides substantially better lexing performance because
                     # more efficient manner than the normal regular expression rules.
 
 
-literals = ['+', '-', '*', '/', ':', ';', '(', ')', '{', '}', '@', '.', ',','=','<']
-
-def t_lbrace(t):
-    r'\{'
-    t.type = '{'      
-    return t
-
-
-def t_rbrace(t):
-    r'\}'
-    t.type = '}'      
-    return t
-
-
 # Lidar com strings que não forem tokenizadas, isto é, não possuem regra de reconhecimento 
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
+
+literals = ['+', '-', '*', '/', ':', ';', '(', ')', '{', '}', '@', '.', ',','=','<']
 
 # Constrói o lexer criando uma expressão regular geral
 lex.lex()   
