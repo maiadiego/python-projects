@@ -25,7 +25,7 @@ reserved = {
 }
 
 tokens = ['LPAREN','RPAREN','LBRACE', 'RBRACE', 'DOUBLEDOT', 'COMMA', 'DOT', 'DOTCOMMA', 'AT',
-          'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EQ', 'LT', 'LE', 'ARROW', 'COMPLEMENT', 'NOT',
+          'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EQ', 'LT', 'LE', 'ARROW', 'COMPLEMENT',
           'INTEGER', 'STRING', 'BOOL',
           'TYPE', 'ID',
           'EL'] + list(reserved.values())

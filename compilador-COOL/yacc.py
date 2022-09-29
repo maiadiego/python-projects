@@ -24,33 +24,52 @@ def p_program(p):
     """program : classes"""
 
 
+def p_classes(p):
+    """classes : class
+               | class classes"""
+
+
 def p_class(p):
-    """class : CLASS TYPE inherits LBRACE features_opt RBRACE DOTCOMMA"""
+    """class : CLASS TYPE inherits TYPE LBRACE features_opt RBRACE DOTCOMMA"""
+
+
+def p_features_opt(p):
+    """features_opt : features
+                    | empty"""
+
+def p_features(p):
+    """features : feature
+                | feature features"""
    
 
 def p_feature(p):
     """feature : ID LPAREN formals_opt RPAREN DOUBLEDOT TYPE LBRACE expr RBRACE DOTCOMMA
-               | attr_def DOTCOMMA"""
-
-
-def p_formal(p):
-    """formal : ID DOUBLEDOT TYPE"""
+               | ID DOTCOMMA TYPE assign_opt"""
 
 
 def p_formals_opt(p):
     """formals_opt : formals
                    | empty"""
+
+
+def p_formals(p):
+    """formals : formal
+               | formal COMMA formals"""
+
+
+def p_formal(p):
+    """formal : ID DOUBLEDOT TYPE"""
     
 
 def p_expr(p):
-    """expr : ID assign                                      # ID <- expr
-            | expr targettype_opt DOT function_call          # expr[@TYPE].ID( [ expr [[, expr]]∗ ] )
-            | function_call                                  # ID( [ expr [[, expr]]∗ ] )
-            | IF expr THEN expr ELSE expr FI                 # if expr then expr else expr fi
-            | WHILE expr LOOP expr POOL                      # while expr loop expr pool
-            | LBRACE expr DOTCOMMA RBRACE                    # { [[expr; ]]+ }      ** ATENÇÃO NESSA REGRA **
-            | LET attr_defs IN expr                          # let ID : TYPE [ <- expr ] [[, ID : TYPE [ <- expr ]]]∗ in expr    
-            | CASE expr OF typeactions ESAC                  # case expr of [[ID : TYPE => expr; ]]+ esac
+    """expr : ID ARROW expr                                      
+            | expr targettype_opt DOT function_call          
+            | function_call                                  
+            | IF expr THEN expr ELSE expr FI                
+            | WHILE expr LOOP expr POOL                      
+            | LBRACE expr DOTCOMMA RBRACE                    
+            | LET attr_defs IN expr                              
+            | CASE expr OF typeactions ESAC                  
             | NEW TYPE
             | ISVOID expr
             | expr PLUS expr
@@ -61,13 +80,13 @@ def p_expr(p):
             | expr LT expr
             | expr LE expr
             | expr EQ expr
-            | NOT expr
-            | LBRACE block RBRACE                       ** ATENÇÃO AQUI **
+            | NOT expr                     
             | LPAREN expr RPAREN
             | ID
             | INTEGER
             | STRING
-            | BOOL
+            | TRUE
+            | FALSE
     """
 
 # regras auxiliares  
@@ -91,7 +110,7 @@ def p_attr_defs(p):
 
 
 def p_attr_def(p):
-    """attr_def : ID COLON TYPE assign_opt"""
+    """attr_def : ID DOUBLEDOT TYPE assign_opt"""
 
 
 def p_typeactions(p):
@@ -125,6 +144,11 @@ def p_params(p):
     """params : expr
               | expr COMMA params"""
 
+def p_empty(p):
+    """empty :"""
+
+def p_error(p):
+    print('Syntax error in input at {!r}'.format(p))
 
 # Build the parser
 parser = yacc.yacc()
