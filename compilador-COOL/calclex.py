@@ -22,9 +22,12 @@ reserved = {
    'then' : 'THEN',
    'else' : 'ELSE',
    'while' : 'WHILE',
+   'self' : 'SELF'
 }
 
-tokens = ['LPAREN','RPAREN','LBRACE', 'RBRACE', 'DOUBLEDOT', 'COMMA', 'DOT', 'DOTCOMMA', 'AT',
+literals = ['+', '-', '*', '/', ':', ';', '(', ')', '{', '}', '@', '.', ',','=','<']
+
+tokens = ['LPAREN','RPAREN', 'LBRACE', 'RBRACE', 'DOUBLEDOT', 'COMMA', 'DOT', 'DOTCOMMA', 'AT',
           'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EQ', 'LT', 'LE', 'ARROW', 'COMPLEMENT',
           'INTEGER', 'STRING', 'BOOL',
           'TYPE', 'ID',
@@ -38,7 +41,7 @@ t_DOUBLEDOT = r':'
 t_COMMA = r','
 t_DOT = r'\.'
 t_DOTCOMMA = r';'
-t_AT = r'\@' 
+t_AT = r'@' 
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
@@ -46,7 +49,7 @@ t_DIVIDE  = r'/'
 t_EQ = r'='
 t_LT = r'<'
 t_LE = r'<='
-t_EL = r'\=\>'  
+t_EL = r'=>'  
 t_ARROW = r'<-'
 t_COMPLEMENT = r'~'
 
@@ -109,9 +112,9 @@ def find_column(input, token):
 
 
 # A string containing ignored characters (spaces and tabs)
-t_ignore  = ' \t'   # provides substantially better lexing performance because 
-                    # it is handled as a special case and is checked in a much 
-                    # more efficient manner than the normal regular expression rules.
+t_ignore  = ' \t\r\f'   # provides substantially better lexing performance because 
+                        # it is handled as a special case and is checked in a much 
+                        # more efficient manner than the normal regular expression rules.
 
 
 # Lidar com strings que não forem tokenizadas, isto é, não possuem regra de reconhecimento 
@@ -119,8 +122,6 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
-
-literals = ['+', '-', '*', '/', ':', ';', '(', ')', '{', '}', '@', '.', ',','=','<']
 
 # Constrói o lexer criando uma expressão regular geral
 lex.lex()   
