@@ -30,7 +30,8 @@ def p_classes(p):
 
 
 def p_class(p):
-    """class : CLASS TYPE inherits TYPE LBRACE features_opt RBRACE DOTCOMMA"""
+    """class : CLASS TYPE inherits LBRACE features_opt RBRACE DOTCOMMA"""
+     
 
 
 def p_features_opt(p):
@@ -44,7 +45,7 @@ def p_features(p):
 
 def p_feature(p):
     """feature : ID LPAREN formals_opt RPAREN DOUBLEDOT TYPE LBRACE expr RBRACE DOTCOMMA
-               | ID DOTCOMMA TYPE assign_opt"""
+               | attr_def DOTCOMMA"""
 
 
 def p_formals_opt(p):
@@ -62,12 +63,11 @@ def p_formal(p):
     
 
 def p_expr(p):
-    """expr : ID ARROW expr                                      
+    """expr : ID assign                                      
             | expr targettype_opt DOT function_call          
             | function_call                                  
             | IF expr THEN expr ELSE expr FI                
-            | WHILE expr LOOP expr POOL                      
-            | LBRACE expr DOTCOMMA RBRACE                    
+            | WHILE expr LOOP expr POOL                                      
             | LET attr_defs IN expr                              
             | CASE expr OF typeactions ESAC                  
             | NEW TYPE
@@ -80,13 +80,13 @@ def p_expr(p):
             | expr LT expr
             | expr LE expr
             | expr EQ expr
+            | LBRACE block RBRACE
             | NOT expr                     
             | LPAREN expr RPAREN
             | ID
             | INTEGER
             | STRING
-            | TRUE
-            | FALSE
+            | BOOL
     """
 
 # regras auxiliares  
@@ -140,24 +140,48 @@ def p_params_opt(p):
     """params_opt : params
                   | empty"""
 
+
 def p_params(p):
     """params : expr
               | expr COMMA params"""
 
+
+def p_block(p):
+    """block : blockelements"""
+
+
+def p_blockelements(p):
+    """blockelements : expr DOTCOMMA
+                     | expr DOTCOMMA blockelements"""
+
+
+def p_expr_self(p):
+    """expr  : SELF"""
+
+    
 def p_empty(p):
-    """empty :"""
+    """empty :""" 
+
 
 def p_error(p):
     print('Syntax error in input at {!r}'.format(p))
 
+
 # Build the parser
 parser = yacc.yacc()
 
-while True:
-   try:
-       s = input('calc > ')
-   except EOFError:
-       break
-   if not s: continue
-   result = parser.parse(s)
-   print(result)
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1:
+        data = open(sys.argv[1], 'r').read()
+        result = parser.parse(data)
+        print(result)
+    else:
+        while True:
+            try:
+                s = input('coolp> ')
+            except EOFError:
+                break
+            if not s: continue
+            result = parser.parse(s)
+            print(result)
