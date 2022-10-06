@@ -22,11 +22,18 @@ precedence = (
 
 def p_program(p):
     """program : classes"""
+    p[0] = p[1] 
 
 
 def p_classes(p):
     """classes : class
                | class classes"""
+    if len(p) == 2:
+        p[0] = [p[1]]
+    elif len(p) == 3:
+        p[0] = p[1] + p[[2]]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_class(p):
@@ -37,7 +44,16 @@ def p_features(p):
     """features : feature
                 | feature features
                 | empty"""
-   
+    if len(p) == 2:
+        if p.slice[1].type == 'empty':
+            p[0] = []
+        else:
+            p[0] = [p[1]]
+    elif len(p) == 3:
+        p[0] = [p[1]] + p[2]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
+
 
 def p_feature(p):
     """feature : ID LPAREN formals RPAREN DOUBLEDOT TYPE LBRACE expr RBRACE DOTCOMMA
@@ -48,11 +64,21 @@ def p_formals(p):
     """formals : formal
                | formal COMMA formals
                | empty"""
+    if len(p) == 2:
+        if p.slice[1].type == 'empty':
+            p[0] = tuple()
+        else:
+            p[0] = [p[1]]
+    elif len(p) == 4:
+        p[0] = [p[1]] + p[3]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_formal(p):
     """formal : ID DOUBLEDOT TYPE"""
-    
+    p[0] = (p[1], p[3])
+
 
 def p_expr(p):
     """expr : ID ARROW expr                                      
@@ -86,6 +112,12 @@ def p_expr(p):
 def p_targettype(p):
     """targettype : AT TYPE
                   | empty"""
+    if len(p) == 3:
+        p[0] = p[2]
+    elif len(p) == 2:
+        p[0] = p[1]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
     
 
 def p_function_call(p):
@@ -95,6 +127,12 @@ def p_function_call(p):
 def p_attr_defs(p):
     """attr_defs : attr_def
                  | attr_def COMMA attr_defs"""
+    if len(p) == 2:
+        p[0] = [p[1]]
+    elif len(p) == 4:
+        p[0] = [p[1]] + p[3]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_attr_def(p):
@@ -104,6 +142,12 @@ def p_attr_def(p):
 def p_typeactions(p):
     """typeactions : typeaction
                    | typeaction typeactions"""
+    if len(p) == 2:
+        p[0] = [p[1]]
+    elif len(p) == 3:
+        p[0] = [p[1]] + p[2]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_typeaction(p):
@@ -113,23 +157,49 @@ def p_typeaction(p):
 def p_inherits(p):
     """inherits : INHERITS TYPE
                 | empty"""
+    if len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 3:
+        p[0] = p[2]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_assign(p):
     """assign : ARROW expr
               | empty"""
+    if len(p) == 3:
+        p[0] = p[2]
+    elif len(p) == 2:
+        p[0] = p[1]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_params(p):
     """params : expr
               | expr COMMA params
               | empty"""
+    if len(p) == 2:
+        if p.slice[1].type == 'empty':       # params opt
+            p[0] = tuple()
+        else:
+            p[0] = [p[1]]
+    elif len(p) == 4:
+        p[0] = [p[1]] + p[3]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 
 def p_blockelements(p):
     """blockelements : expr DOTCOMMA
                      | expr DOTCOMMA blockelements"""
-
+    if len(p) == 3:
+        p[0] = [p[1]]
+    elif len(p) == 4:
+        p[0] = [p[1]] + p[3]
+    else:
+        raise SyntaxError('Número de símbolos inválido')
 
 def p_expr_self(p):
     """expr  : SELF"""
@@ -137,6 +207,7 @@ def p_expr_self(p):
     
 def p_empty(p):
     """empty :""" 
+    p[0] = None
 
 
 def p_error(p):
