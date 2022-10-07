@@ -19,6 +19,7 @@ precedence = (
     The values of p[i] are mapped to grammar symbols. """
 
 # regras de acordo com a ordem do manual de cool
+# Ctrl K + Ctrl C pra comentar em bloco e Ctrl K + Ctrl U para descomentar
 
 def p_program(p):
     """program : classes"""
@@ -38,6 +39,7 @@ def p_classes(p):
 
 def p_class(p):
     """class : CLASS TYPE inherits LBRACE features RBRACE DOTCOMMA"""
+    p[0] = Class(p[2], p[3], p[5])
      
 
 def p_features(p):
@@ -107,8 +109,65 @@ def p_expr(p):
             | BOOL
     """
 
-# regras auxiliares  
+    first_token = p.slice[1].type
+    second_token = p.slice[2].type if len(p) > 2 else None
+    third_token = p.slice[3].type if len(p) > 3 else None
 
+    if first_token == 'ID':
+        if second_token is None:
+            p[0] = Id(p[1])
+        elif second_token == 'assign':
+            p[0] = idAssign(p[1], p[3])  # não tenho certeza
+    
+    # falta a segunda regra
+
+    elif first_token == 'function_call':
+        p[0] = p[1]
+    elif first_token == 'IF':
+        p[0] = If(p[2], p[4], p[6])
+    elif first_token == 'WHILE':
+        p[0] = While(p[2], p[4])
+    elif first_token == 'LBRACE':
+        p[0] = Block(p[2])
+    elif first_token == 'LET':
+        p[0] = Let(p[2], p[4])
+    elif first_token == 'CASE':
+        p[0] = ast.Case(p[2], p[4])
+    elif first_token == 'NEW':
+        p[0] = New(p[2])
+    elif first_token == 'ISVOID':
+        p[0] = Isvoid(p[2])
+    elif first_token == 'NOT':
+        p[0] = Not(p[2])
+    elif first_token == 'COMPLEMENT':
+        p[0] = Complement(p[2])
+    elif first_token == 'LBRACE':
+        p[0] = p[2]
+    elif first_token == 'INTEGER':
+        p[0] = Int(p[1])
+    elif first_token == 'STRING':
+        p[0] = Str(p[1])
+    elif first_token == 'BOOL':
+        p[0] = Bool(p[1])
+
+    # binary operations
+    if second_token == '+':
+        p[0] = Plus(p[1], p[3])
+    elif second_token == '-':
+        p[0] = Sub(p[1], p[3])
+    elif second_token == '*':
+        p[0] = Mult(p[1], p[3])
+    elif second_token == '/':
+        p[0] = Div(p[1], p[3])
+    elif second_token == '<':
+        p[0] = Lt(p[1], p[3])
+    elif second_token == '<=':
+        p[0] = Le(p[1], p[3])
+    elif second_token == '=':
+        p[0] = Eq(p[1], p[3])
+    
+
+# regras auxiliares  
 def p_targettype(p):
     """targettype : AT TYPE
                   | empty"""
