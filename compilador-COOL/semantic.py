@@ -98,16 +98,16 @@ def constroi_arvore_de_heranca(ast):
         
         inheritance_tree[cl.parent].add(cl.name)
     
-    print(classes_dict)
-    print("\n\n")
-    print(inheritance_tree)
+    #print(classes_dict)
+    #print("\n\n")
+    #print(inheritance_tree)
 
   
 def checa_classes_indefinidas():
     initial_parents = list(inheritance_tree.keys())
     for parentc in initial_parents:
         if parentc not in classes_dict and parentc != "Object":
-            warnings.warn("Classes %s herdam de uma classe pai indefinida %s" % (inheritance_tree[parentc], parentc), SemantWarning)
+            warnings.warn("classes %s herdam de uma classe pai indefinida %s" % (inheritance_tree[parentc], parentc), SemantWarning)
             inheritance_tree['Object'] |= inheritance_tree[parentc]  # classe intermediária não existe, então faça com que essas classes herdem de Object
             del inheritance_tree[parentc]
 
@@ -115,34 +115,37 @@ def checa_classes_indefinidas():
 def impede_heranca_de_classes_base():
     for parent in ['String', 'Int', 'Bool']:
         for cl_name in inheritance_tree[parent]:
-            raise SemantError("Classe %s não pode herdar de uma classe base %s" % (cl_name, parent))
+            raise SemantError("classe '%s' não pode herdar de uma classe base '%s'" % (cl_name, parent))
 
 
-# def visita_arvore_de_heranca(start_class, visited):
-#     visited[start_class] = True
+def visita_arvore_de_heranca(start_class, visited):
+    visited[start_class] = True
 
-#     if start_class not in inheritance_tree.keys():
-#         return True
+    if start_class not in inheritance_tree.keys():
+        return True
 
-#     for childc in inheritance_tree[start_class]:
-#         visita_arvore_de_heranca(childc, visited)
+    for childc in inheritance_tree[start_class]:
+        visita_arvore_de_heranca(childc, visited)
 
-#     return True
+    return True
 
 
-# def checa_ciclos_de_heranca():
-#     visited = {}    # dicionário para marcar as classes visitadas
-#     for parent_name in inheritance_tree.keys():
-#         visited[parent_name] = False
-#         for cl_name in inheritance_tree[parent_name]:
-#             visited[cl_name] = False
+def checa_ciclos_de_heranca():
+    visited = {}    # dicionário para marcar as classes visitadas
+    for parent_name in inheritance_tree.keys():
+        visited[parent_name] = False
+        for cl_name in inheritance_tree[parent_name]:
+            visited[cl_name] = False
     
-#     # Executa uma travessia em profundidade do gráfico de herança, altera o dict à medida que avança
-#     visita_arvore_de_heranca("Object", visited)
+    #print(visited)
+    # Executa uma travessia em profundidade do gráfico de herança, altera o dict à medida que avança
+    visita_arvore_de_heranca("Object", visited)
     
-#     for class_name,v in visited.items():
-#         if not v:
-#             raise SemantError("%s envolvido em um ciclo de herança" % class_name)
+    #print(visited)
+
+    for class_name,v in visited.items():
+        if not v:
+            raise SemantError("Classe '%s' envolvida em um ciclo de herança" % class_name)
 
 
 # def checa_escopos_e_infere_tipos_de_retorno(cl):  
@@ -563,11 +566,11 @@ def impede_heranca_de_classes_base():
 
 
 def semant(ast):
-    arvore = constroi_classes_base(ast)
-    constroi_arvore_de_heranca(arvore)
-    #checa_classes_indefinidas()
-    #impede_heranca_de_classes_base()
-    # checa_ciclos_de_heranca()
+    constroi_classes_base(ast)
+    constroi_arvore_de_heranca(ast)
+    checa_classes_indefinidas()
+    impede_heranca_de_classes_base()
+    checa_ciclos_de_heranca()
     # expandir_classes_herdadas()
     
     # for cl in classes_dict.values():
@@ -592,3 +595,7 @@ if __name__ == '__main__':
                 semant(ast)
             except SemantError as e:
                 print("Semantic Analyzer failure: %s" % str(e))
+            else:
+                print("Semantic Analyzer sucessful!")
+
+        
