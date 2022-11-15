@@ -38,8 +38,6 @@ Div = returnable_namedtuple("Div", "first, second")
 Lt = returnable_namedtuple("Lt", "first, second")
 Le = returnable_namedtuple("Le", "first, second")
 Eq = returnable_namedtuple("Eq", "first, second")
-#Dispatch = returnable_namedtuple('Dispatch', 'id params')
-#StaticDispatch = returnable_namedtuple('StaticDispatch', 'object targettype method')
 Dispatch = returnable_namedtuple("Dispatch", "body, method, expr_list")
 StaticDispatch = returnable_namedtuple("StaticDispatch", "body, type, method, expr_list")
 Attr = namedtuple("Attr", "name, type, body")
@@ -75,7 +73,7 @@ def p_class_list_single(p):
 
 def p_class(p):
     """class : CLASS TYPE LBRACE features RBRACE"""
-    p[0] = Class(p[2], "Id", p[4])
+    p[0] = Class(p[2], "Object", p[4])
 
 def p_class_inherits(p):
     """class : CLASS TYPE INHERITS TYPE LBRACE features RBRACE"""
