@@ -19,12 +19,11 @@ Class = namedtuple("Class", "name, parent, feature_list")
 Method = returnable_namedtuple("Method", "name, formal_list, return_type, body") 
 Id = returnable_namedtuple('Id', 'name')
 Assign = returnable_namedtuple("Assign", "name, body")
-MethodCall = returnable_namedtuple('MethodCall', 'object targettype method')
 If = returnable_namedtuple("If", "predicate, then_body, else_body")
 While = returnable_namedtuple("While", "predicate, body")
 Block = returnable_namedtuple("Block", "body")
 Let = returnable_namedtuple('Let', 'assignments expr')
-Case = returnable_namedtuple('Case', "expr, typeactions")
+Case = returnable_namedtuple('Case', "expr, case_list")
 New = returnable_namedtuple("New", "type")
 Isvoid = returnable_namedtuple("Isvoid", "body")
 Not = returnable_namedtuple("Not", "body")
@@ -39,7 +38,10 @@ Div = returnable_namedtuple("Div", "first, second")
 Lt = returnable_namedtuple("Lt", "first, second")
 Le = returnable_namedtuple("Le", "first, second")
 Eq = returnable_namedtuple("Eq", "first, second")
-FunctionCall = returnable_namedtuple('FunctionCall', 'id params')
+#Dispatch = returnable_namedtuple('Dispatch', 'id params')
+#StaticDispatch = returnable_namedtuple('StaticDispatch', 'object targettype method')
+Dispatch = returnable_namedtuple("Dispatch", "body, method, expr_list")
+StaticDispatch = returnable_namedtuple("StaticDispatch", "body, type, method, expr_list")
 Attr = namedtuple("Attr", "name, type, body")
 TypeAction = returnable_namedtuple('TypeAction', 'id type expr')
 Self = returnable_namedtuple('Self','id')
@@ -129,8 +131,9 @@ def p_formal(p):
 
 def p_expr(p):
     """expr : ID ARROW expr                                      
-            | expr targettype DOT function_call          
-            | function_call                                  
+            | expr AT TYPE DOT ID LPAREN expr_list RPAREN    
+            | expr DOT ID LPAREN expr_list RPAREN            
+            | dispatch                                  
             | IF expr THEN expr ELSE expr FI                
             | WHILE expr LOOP expr POOL      
             | LBRACE blockelements RBRACE                                
@@ -165,10 +168,14 @@ def p_expr(p):
             p[0] = Assign(p[1], p[3])  
     
     elif first_token == 'expr':
-        if third_token == 'DOT':
-            p[0] = MethodCall(p[1], p[2], p[4])
+        if second_token == 'AT':
+            p[0] = StaticDispatch(p[1], p[3], p[5], p[7])
+    
+    elif first_token == 'expr':
+        if second_token == 'DOT':
+            p[0] = Dispatch(p[1], p[3], p[5])
 
-    elif first_token == 'function_call':
+    elif first_token == 'dispatch':
         p[0] = p[1]
     elif first_token == 'IF':
         p[0] = If(p[2], p[4], p[6])
@@ -179,7 +186,7 @@ def p_expr(p):
     elif first_token == 'LET':
         p[0] = Let(p[2], p[4])
     elif first_token == 'CASE':
-        p[0] = ast.Case(p[2], p[4])
+        p[0] = Case(p[2], p[4])
     elif first_token == 'NEW':
         p[0] = New(p[2])
     elif first_token == 'ISVOID':
@@ -216,20 +223,9 @@ def p_expr(p):
 
 # regras auxiliares 
 
-def p_targettype(p):
-    """targettype : AT TYPE
-                  | empty"""
-    if len(p) == 3:
-        p[0] = p[2]
-    elif len(p) == 2:
-        p[0] = p[1]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
-    
-
-def p_function_call(p):
-    """function_call : ID LPAREN params RPAREN"""
-    p[0] = FunctionCall(p[1], p[3])
+def p_dispatch(p):
+    """dispatch : ID LPAREN expr_list RPAREN"""
+    p[0] = Dispatch("self", p[1], p[3])
 
 
 def p_attr_defs(p):
@@ -264,17 +260,6 @@ def p_typeaction(p):
     p[0] = TypeAction(p[1], p[3], p[5])
 
 
-# def p_inherits(p):
-#     """inherits : INHERITS TYPE
-#                 | empty"""
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     elif len(p) == 3:
-#         p[0] = p[2]
-#     else:
-#         raise SyntaxError('Número de símbolos inválido')
-
-
 def p_assign(p):
     """assign : ARROW expr
               | empty"""
@@ -286,17 +271,19 @@ def p_assign(p):
         raise SyntaxError('Número de símbolos inválido')
 
 
-def p_params(p):
-    """params : expr
-              | expr COMMA params
-              | empty"""
+def p_expr_list(p):
+    """expr_list : empty
+                 | expr
+                 | expr_list COMMA expr """
+    
     if len(p) == 2:
         if p.slice[1].type == 'empty':       # params opt
-            p[0] = tuple()
+            p[0] = []
         else:
             p[0] = [p[1]]
+    
     elif len(p) == 4:
-        p[0] = [p[1]] + p[3]
+        p[0] = p[1] + [p[3]]
     else:
         raise SyntaxError('Número de símbolos inválido')
 
