@@ -21,8 +21,7 @@ reserved = {
    'if' : 'IF',
    'then' : 'THEN',
    'else' : 'ELSE',
-   'while' : 'WHILE',
-   'self' : 'SELF'
+   'while' : 'WHILE' 
 }
 
 literals = ['+', '-', '*', '/', ':', ';', '(', ')', '{', '}', '@', '.', ',','=','<']
@@ -54,15 +53,37 @@ t_ARROW = r'<-'
 t_COMPLEMENT = r'~'
 
 
-def t_ID(t):
-    r'[a-z][A-Za-z0-9_]*'
-    t.type = reserved.get(t.value.lower(), 'ID') 
+def t_id_types_and_reserved_words(t):
+    r'[a-zA-Z][a-zA-Z0-9_]*'
+    if t.value == 'true':
+        t.type = 'BOOL'
+        t.value = True
+        return t
+    
+    if t.value == 'false':
+        t.type = 'BOOL'
+        t.value = False
+        return t
+
+    if t.value.lower() in reserved:
+        t.type = t.value.upper()
+    else:
+        if t.value[0].islower():
+            t.type = 'ID'
+        else:
+            t.type = 'TYPE'
     return t
 
 
-def t_TYPE(t):
-    r'[A-Z][A-Za-z0-9_]*'
-    return t
+# def t_ID(t):
+#     r'[a-z][A-Za-z0-9_]*'
+#     t.type = reserved.get(t.value.lower(), 'ID') 
+#     return t
+
+
+# def t_TYPE(t):
+#     r'[A-Z][A-Za-z0-9_]*'
+#     return t
 
 
 def t_STRING(t):
@@ -76,10 +97,10 @@ def t_INTEGER(t):
     return t
 
 
-def t_BOOL(t):
-    r'true|false'
-    t.value = True if t.value == 'true' else False
-    return 
+# def t_BOOL(t):
+#     r'true|false'
+#     t.value = True if t.value == 'true' else False
+#     return 
 
 
 def t_COMMENT(t):
