@@ -7,8 +7,17 @@ from types import new_class
 class Returnable:
     return_type = None
 
+
 def returnable_namedtuple(type_name, fields):
     return new_class(type_name, (Returnable, namedtuple(type_name, fields)))
+
+
+class Inheritable:
+    inherited_from = None
+
+
+def inheritable_namedtuple(type_name, fields):
+    return new_class(type_name, (Inheritable, namedtuple(type_name, fields)))
 
 
 # namedtuple é uma forma concisa para criar classes que representam os nós 
@@ -16,21 +25,16 @@ def returnable_namedtuple(type_name, fields):
 # new_class cria um objeto de classe dinamicamente passando o nome e as definições do cabeçalho da classe
 
 Class = namedtuple("Class", "name, parent, feature_list")
-Method = returnable_namedtuple("Method", "name, formal_list, return_type, body") 
-Id = returnable_namedtuple('Id', 'name')
-Assign = returnable_namedtuple("Assign", "name, body")
-If = returnable_namedtuple("If", "predicate, then_body, else_body")
-While = returnable_namedtuple("While", "predicate, body")
-Block = returnable_namedtuple("Block", "body")
-Let = returnable_namedtuple('Let', 'assignments expr')
-Case = returnable_namedtuple('Case', "expr, case_list")
-New = returnable_namedtuple("New", "type")
-Isvoid = returnable_namedtuple("Isvoid", "body")
-Not = returnable_namedtuple("Not", "body")
-Complement = returnable_namedtuple("Complement", "body") 
+Method = inheritable_namedtuple("Method", "name, formal_list, return_type, body")
+Attr = namedtuple("Attr", "name, type, body")
+Id = returnable_namedtuple("Id", "name")
 Int = returnable_namedtuple("Int", "content")
 Bool = returnable_namedtuple("Bool", "content")
 Str = returnable_namedtuple("Str", "content")
+Block = returnable_namedtuple("Block", "body")
+Assign = returnable_namedtuple("Assign", "name, body")
+Dispatch = returnable_namedtuple("Dispatch", "body, method, expr_list")
+StaticDispatch = returnable_namedtuple("StaticDispatch", "body, type, method, expr_list")
 Plus = returnable_namedtuple("Plus", "first, second")
 Sub = returnable_namedtuple("Sub", "first, second")
 Mult = returnable_namedtuple("Mult", "first, second")
@@ -38,20 +42,23 @@ Div = returnable_namedtuple("Div", "first, second")
 Lt = returnable_namedtuple("Lt", "first, second")
 Le = returnable_namedtuple("Le", "first, second")
 Eq = returnable_namedtuple("Eq", "first, second")
-Dispatch = returnable_namedtuple("Dispatch", "body, method, expr_list")
-StaticDispatch = returnable_namedtuple("StaticDispatch", "body, type, method, expr_list")
-Attr = namedtuple("Attr", "name, type, body")
-TypeAction = returnable_namedtuple('TypeAction', 'id type expr')
-Self = returnable_namedtuple('Self','id')
+If = returnable_namedtuple("If", "predicate, then_body, else_body")
+While = returnable_namedtuple("While", "predicate, body")
+Let = returnable_namedtuple("Let", "object, type, init, body")
+Case = returnable_namedtuple("Case", "expr, case_list")
+New = returnable_namedtuple("New", "type")
+Isvoid = returnable_namedtuple("Isvoid", "body")
+Neg = returnable_namedtuple("Neg", "body")
+Not = returnable_namedtuple("Not", "body")
 
 precedence = (
     ('right', 'ARROW'),
-    ('right', 'NOT'),
+    ('left', 'NOT'),
     ('nonassoc', 'LE', 'LT', 'EQ'),
     ('left', 'PLUS', 'MINUS'),
     ('left', 'TIMES', 'DIVIDE'),
-    ('right', 'ISVOID'),
-    ('right', 'COMPLEMENT'),
+    ('left', 'ISVOID'),
+    ('left', 'COMPLEMENT'),
     ('left', 'AT'),
     ('left', 'DOT'),
 )
@@ -72,238 +79,211 @@ def p_class_list_single(p):
     p[0] = [p[1]]
 
 def p_class(p):
-    """class : CLASS TYPE LBRACE features RBRACE"""
+    """class : CLASS TYPE LBRACE feature_list RBRACE"""
     p[0] = Class(p[2], "Object", p[4])
 
 def p_class_inherits(p):
-    """class : CLASS TYPE INHERITS TYPE LBRACE features RBRACE"""
+    """class : CLASS TYPE INHERITS TYPE LBRACE feature_list RBRACE"""
     p[0] = Class(p[2], p[4], p[6])
-     
 
-def p_features(p):
-    """features : feature
-                | feature features
-                | empty"""
-    if len(p) == 2:
-        if p.slice[1].type == 'empty':
-            p[0] = []
-        else:
-            p[0] = [p[1]]
-    elif len(p) == 3:
-        p[0] = [p[1]] + p[2]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_feature_list_many(p):
+    """feature_list : feature_list feature DOTCOMMA"""
+    p[0] = p[1] + [p[2]]  
 
+def p_feature_list_single(p):
+    """feature_list : feature DOTCOMMA"""
+    p[0] = [p[1]]
 
-def p_feature(p):
-    """feature : ID LPAREN formals RPAREN DOUBLEDOT TYPE LBRACE expr RBRACE DOTCOMMA
-               | attr_def DOTCOMMA"""
-    
-    if len(p) == 11:
-        p[0] = Method(p[1], p[3], p[6], p[8])
-    elif len(p) == 3:
-        p[0] = p[1]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_feature_list_empty(p):
+    """feature_list : """
+    p[0] = []
 
+def p_feature_method(p):
+    """feature : ID LPAREN formal_list RPAREN DOUBLEDOT TYPE LBRACE expression RBRACE"""
+    p[0] = Method(p[1], p[3], p[6], p[8])
 
-def p_formals(p):
-    """formals : formal
-               | formal COMMA formals
-               | empty"""
-    if len(p) == 2:
-        if p.slice[1].type == 'empty':
-            p[0] = tuple()
-        else:
-            p[0] = [p[1]]
-    elif len(p) == 4:
-        p[0] = [p[1]] + p[3]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_feature_method_no_formals(p):
+    """feature : ID LPAREN RPAREN DOUBLEDOT TYPE LBRACE expression RBRACE"""
+    p[0] = Method(p[1], [], p[5], p[7])
 
+def p_feature_attr_initialized(p):
+    """feature : ID DOUBLEDOT TYPE ARROW expression"""
+    p[0] = Attr(p[1], p[3], p[5])
+
+def p_feature_attr(p):
+    """feature : ID DOUBLEDOT TYPE"""
+    p[0] = Attr(p[1], p[3], None)
+
+def p_formal_list_many(p):
+    """formal_list : formal_list COMMA formal"""
+    p[0] = p[1] + [p[3]]
+
+def p_formal_list_single(p):
+    """formal_list : formal"""
+    p[0] = [p[1]]
 
 def p_formal(p):
     """formal : ID DOUBLEDOT TYPE"""
     p[0] = (p[1], p[3])
 
+def p_expression_object(p):
+    """expression : ID"""
+    p[0] = Id(p[1])
 
-def p_expr(p):
-    """expr : ID ARROW expr                                      
-            | expr AT TYPE DOT ID LPAREN expr_list RPAREN    
-            | expr DOT ID LPAREN expr_list RPAREN            
-            | dispatch                                  
-            | IF expr THEN expr ELSE expr FI                
-            | WHILE expr LOOP expr POOL      
-            | LBRACE blockelements RBRACE                                
-            | LET attr_defs IN expr                              
-            | CASE expr OF typeactions ESAC                  
-            | NEW TYPE
-            | ISVOID expr
-            | expr PLUS expr
-            | expr MINUS expr
-            | expr TIMES expr
-            | expr DIVIDE expr
-            | COMPLEMENT expr
-            | expr LT expr
-            | expr LE expr
-            | expr EQ expr
-            | NOT expr                     
-            | LPAREN expr RPAREN
-            | ID
-            | INTEGER
-            | STRING
-            | BOOL
-    """
+def p_expression_int(p):
+    """expression : INTEGER"""
+    p[0] = Int(p[1])
 
-    first_token = p.slice[1].type
-    second_token = p.slice[2].type if len(p) > 2 else None
-    third_token = p.slice[3].type if len(p) > 3 else None
+def p_expression_bool(p):
+    """expression : BOOL"""
+    p[0] = Bool(p[1])
 
-    if first_token == 'ID':
-        if second_token is None:
-            p[0] = Id(p[1])
-        elif second_token == 'ARROW':
-            p[0] = Assign(p[1], p[3])  
-    
-    elif first_token == 'expr':
-        if second_token == 'AT':
-            p[0] = StaticDispatch(p[1], p[3], p[5], p[7])
-    
-    elif first_token == 'expr':
-        if second_token == 'DOT':
-            p[0] = Dispatch(p[1], p[3], p[5])
+def p_expression_str(p):
+    """expression : STRING"""
+    p[0] = Str(p[1])
 
-    elif first_token == 'dispatch':
-        p[0] = p[1]
-    elif first_token == 'IF':
-        p[0] = If(p[2], p[4], p[6])
-    elif first_token == 'WHILE':
-        p[0] = While(p[2], p[4])
-    elif first_token == 'LBRACE':
-        p[0] = Block(p[2])
-    elif first_token == 'LET':
-        p[0] = Let(p[2], p[4])
-    elif first_token == 'CASE':
-        p[0] = Case(p[2], p[4])
-    elif first_token == 'NEW':
-        p[0] = New(p[2])
-    elif first_token == 'ISVOID':
-        p[0] = Isvoid(p[2])
-    elif first_token == 'NOT':
-        p[0] = Not(p[2])
-    elif first_token == 'COMPLEMENT':
-        p[0] = Complement(p[2])
-    elif first_token == 'LBRACE':
-        p[0] = p[2]
-    elif first_token == 'INTEGER':
-        p[0] = Int(p[1])
-    elif first_token == 'STRING':
-        p[0] = Str(p[1])
-    elif first_token == 'BOOL':
-        p[0] = Bool(p[1])
+def p_expression_block(p):
+    """expression : LBRACE block_list RBRACE"""
+    p[0] = Block(p[2])
 
-    # binary operations
-    if second_token == '+':
-        p[0] = Plus(p[1], p[3])
-    elif second_token == '-':
-        p[0] = Sub(p[1], p[3])
-    elif second_token == '*':
-        p[0] = Mult(p[1], p[3])
-    elif second_token == '/':
-        p[0] = Div(p[1], p[3])
-    elif second_token == '<':
-        p[0] = Lt(p[1], p[3])
-    elif second_token == '<=':
-        p[0] = Le(p[1], p[3])
-    elif second_token == '=':
-        p[0] = Eq(p[1], p[3])
-    
+def p_block_list_many(p):
+    """block_list : block_list expression DOTCOMMA"""
+    p[0] = p[1] + [p[2]]
 
-# regras auxiliares 
+def p_block_list_single(p):
+    """block_list : expression DOTCOMMA"""
+    p[0] = [p[1]]
 
-def p_dispatch(p):
-    """dispatch : ID LPAREN expr_list RPAREN"""
+def p_expression_assignment(p):
+    """expression : ID ARROW expression"""
+    p[0] = Assign(Id(p[1]), p[3])
+
+def p_expression_dispatch(p):
+    """expression : expression DOT ID LPAREN expr_list RPAREN"""
+    p[0] = Dispatch(p[1], p[3], p[5])
+
+def p_expr_list_many(p):
+    """expr_list : expr_list COMMA expression"""
+    p[0] = p[1] + [p[3]]
+
+def p_expr_list_single(p):
+    """expr_list : expression"""
+    p[0] = [p[1]]
+
+def p_expr_list_empty(p):
+    """expr_list : """
+    p[0] = []
+
+def p_expression_static_dispatch(p):
+    """expression : expression AT TYPE DOT ID LPAREN expr_list RPAREN"""
+    p[0] = StaticDispatch(p[1], p[3], p[5], p[7])
+
+def p_expression_self_dispatch(p):
+    """expression : ID LPAREN expr_list RPAREN"""
     p[0] = Dispatch("self", p[1], p[3])
 
+def p_expression_basic_math(p):
+    """
+    expression : expression PLUS expression
+               | expression MINUS expression
+               | expression TIMES expression
+               | expression DIVIDE expression
+    """
+    if p[2] == '+':
+        p[0] = Plus(p[1], p[3])
+    elif p[2] == '-':
+        p[0] = Sub(p[1], p[3])
+    elif p[2] == '*':
+        p[0] = Mult(p[1], p[3])
+    elif p[2] == '/':
+        p[0] = Div(p[1], p[3])
 
-def p_attr_defs(p):
-    """attr_defs : attr_def
-                 | attr_def COMMA attr_defs"""
-    if len(p) == 2:
-        p[0] = [p[1]]
-    elif len(p) == 4:
-        p[0] = [p[1]] + p[3]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_expression_numerical_comparison(p):
+    """
+    expression : expression LT expression
+               | expression LE expression
+               | expression EQ expression
+    """
+    if p[2] == '<':
+        p[0] = Lt(p[1], p[3])
+    elif p[2] == '<=':
+        p[0] = Le(p[1], p[3])
+    elif p[2] == '=':
+        p[0] = Eq(p[1], p[3])
 
+def p_expression_with_parenthesis(p):
+    """expression : LPAREN expression RPAREN"""
+    p[0] = p[2]
 
-def p_attr_def(p):
-    """attr_def : ID DOUBLEDOT TYPE assign"""
-    p[0] = Attr(p[1], p[3], p[4])
+def p_expression_if(p):
+    """expression : IF expression THEN expression ELSE expression FI"""
+    p[0] = If(p[2], p[4], p[6])
 
+def p_expression_while(p):
+    """expression : WHILE expression LOOP expression POOL"""
+    p[0] = While(p[2], p[4])
 
-def p_typeactions(p):
-    """typeactions : typeaction
-                   | typeaction typeactions"""
-    if len(p) == 2:
-        p[0] = [p[1]]
-    elif len(p) == 3:
-        p[0] = [p[1]] + p[2]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_expression_let(p):
+    """expression : LET ID DOUBLEDOT TYPE IN expression
+       expression : LET ID DOUBLEDOT TYPE COMMA inner_lets"""
+    p[0] = Let(p[2], p[4], None, p[6])
 
+def p_expression_let_initialized(p):
+    """expression : LET ID DOUBLEDOT TYPE ARROW expression IN expression
+       expression : LET ID DOUBLEDOT TYPE ARROW expression COMMA inner_lets"""
+    p[0] = Let(p[2], p[4], p[6], p[8])
 
-def p_typeaction(p):
-    """typeaction : ID DOUBLEDOT TYPE EL expr DOTCOMMA"""
-    p[0] = TypeAction(p[1], p[3], p[5])
+def p_expression_let_with_error_in_first_decl(p):
+    """expression : LET error COMMA ID DOUBLEDOT TYPE IN expression
+       expression : LET error COMMA ID DOUBLEDOT TYPE COMMA inner_lets"""
+    p[0] = Let(p[4], p[6], None, p[8])
 
+def p_expression_let_initialized_with_error_in_first_decl(p):
+    """expression : LET error COMMA ID DOUBLEDOT TYPE ARROW expression IN expression
+       expression : LET error COMMA ID DOUBLEDOT TYPE ARROW expression COMMA inner_lets"""
+    p[0] = Let(p[4], p[6], p[8], p[10])
 
-def p_assign(p):
-    """assign : ARROW expr
-              | empty"""
-    if len(p) == 3:
-        p[0] = p[2]
-    elif len(p) == 2:
-        p[0] = p[1]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_inner_lets_simple(p):
+    """inner_lets : ID DOUBLEDOT TYPE IN expression
+       inner_lets : ID DOUBLEDOT TYPE COMMA inner_lets """
+    p[0] = Let(p[1], p[3], None, p[5])
 
+def p_inner_lets_initialized(p):
+    """inner_lets : ID DOUBLEDOT TYPE ARROW expression IN expression
+       inner_lets : ID DOUBLEDOT TYPE ARROW expression COMMA inner_lets"""
+    p[0] = Let(p[1], p[3], p[5], p[7])
 
-def p_expr_list(p):
-    """expr_list : empty
-                 | expr
-                 | expr_list COMMA expr """
-    
-    if len(p) == 2:
-        if p.slice[1].type == 'empty':       # params opt
-            p[0] = []
-        else:
-            p[0] = [p[1]]
-    
-    elif len(p) == 4:
-        p[0] = p[1] + [p[3]]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_expression_case(p):
+    """expression : CASE expression OF case_list ESAC"""
+    p[0] = Case(p[2], p[4])
 
+def p_case_list_one(p):
+    """case_list : case"""
+    p[0] = [p[1]]
 
-def p_blockelements(p):
-    """blockelements : expr DOTCOMMA
-                     | expr DOTCOMMA blockelements"""
-    if len(p) == 3:
-        p[0] = [p[1]]
-    elif len(p) == 4:
-        p[0] = [p[1]] + p[3]
-    else:
-        raise SyntaxError('Número de símbolos inválido')
+def p_case_list_many(p):
+    """case_list : case_list case"""
+    p[0] = p[1] + [p[2]]
 
-def p_expr_self(p):
-    """expr  : SELF"""
-    p[0] = Self(p[1])
+def p_case_expr(p):
+    """case : ID DOUBLEDOT TYPE EL expression DOTCOMMA"""
+    p[0] = (p[1], p[3], p[5])
 
-    
-def p_empty(p):
-    """empty :""" 
-    p[0] = None
+def p_expression_new(p):
+    """expression : NEW TYPE"""
+    p[0] = New(p[2])
+
+def p_expression_isvoid(p):
+    """expression : ISVOID expression"""
+    p[0] = Isvoid(p[2])
+
+def p_expression_neg(p):
+    """expression : COMPLEMENT expression"""
+    p[0] = Neg(p[2])
+
+def p_expression_not(p):
+    """expression : NOT expression"""
+    p[0] = Not(p[2])
 
 
 def p_error(p):
