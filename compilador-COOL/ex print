@@ -1,0 +1,36 @@
+CELLS.CL
+
+
+classe CellularAutomaton : 
+
+feature_list= [Attr(name='population_map', type='String', body=None), 
+	       Method(name='init', formal_list=[('map', 'String')], return_type='SELF_TYPE', body=Block(body=[Assign(name=Id(name='population_map'), body=Id(name='map')), Id(name='self')])), 
+	       Method(name='print', formal_list=[], return_type='SELF_TYPE', body=Block(body=[Dispatch(body='self', method='out_string', expr_list=[Dispatch(body=Id(name='population_map'), method='concat', expr_list=[Str(content='"\\n"')])]), Id(name='self')])),
+	       Method(name='num_cells', formal_list=[], return_type='Int', body=Dispatch(body=Id(name='population_map'), method='length', expr_list=[])), 
+	       Method(name='cell', formal_list=[('position', 'Int')], return_type='String', body=Dispatch(body=Id(name='population_map'), method='substr', expr_list=[Id(name='position'), Int(content=1)])), 
+	       Method(name='cell_left_neighbor', formal_list=[('position', 'Int')], return_type='String', body=If(predicate=Eq(first=Id(name='position'), second=Int(content=0)), then_body=Dispatch(body='self', method='cell', expr_list=[Sub(first=Dispatch(body='self', method='num_cells', expr_list=[]), second=Int(content=1))]), else_body=Dispatch(body='self', method='cell', expr_list=[Sub(first=Id(name='position'), second=Int(content=1))]))), 
+	       Method(name='cell_right_neighbor', formal_list=[('position', 'Int')], return_type='String', body=If(predicate=Eq(first=Id(name='position'), second=Sub(first=Dispatch(body='self', method='num_cells', expr_list=[]), second=Int(content=1))), then_body=Dispatch(body='self', method='cell', expr_list=[Int(content=0)]), else_body=Dispatch(body='self', method='cell', expr_list=[Plus(first=Id(name='position'), second=Int(content=1))]))),
+	       Method(name='cell_at_next_evolution', formal_list=[('position', 'Int')], return_type='String', body=If(predicate=Eq(first=Plus(first=Plus(first=If(predicate=Eq(first=Dispatch(body='self', method='cell', expr_list=[Id(name='position')]), second=Str(content='"X"')), then_body=Int(content=1), else_body=Int(content=0)), second=If(predicate=Eq(first=Dispatch(body='self', method='cell_left_neighbor', expr_list=[Id(name='position')]), second=Str(content='"X"')), then_body=Int(content=1), else_body=Int(content=0))), second=If(predicate=Eq(first=Dispatch(body='self', method='cell_right_neighbor', expr_list=[Id(name='position')]), second=Str(content='"X"')), then_body=Int(content=1), else_body=Int(content=0))), second=Int(content=1)), then_body=Str(content='"X"'), else_body=Str(content='"."'))),
+	       Method(name='evolve', formal_list=[], return_type='SELF_TYPE', body=Let(object='position', type='Int', init=None, body=Let(object='num', type='Int', init=Dispatch(body='self', method='num_cells', expr_list=[]), body=Let(object='temp', type='String', init=None, body=Block(body=[While(predicate=Lt(first=Id(name='position'), second=Id(name='num')), body=Block(body=[Assign(name=Id(name='temp'), body=Dispatch(body=Id(name='temp'), method='concat', expr_list=[Dispatch(body='self', method='cell_at_next_evolution', expr_list=[Id(name='position')])])), Assign(name=Id(name='position'), body=Plus(first=Id(name='position'), second=Int(content=1)))])), Assign(name=Id(name='population_map'), body=Id(name='temp')), Id(name='self')])))))]
+	       
+
+Classe Main:
+
+[Attr(name='cells', type='CellularAutomaton', body=None), 
+Method(name='main', formal_list=[], return_type='SELF_TYPE', body=Block(body=[Assign(name=Id(name='cells'), body=Dispatch(body=New(type='CellularAutomaton'), method='init', expr_list=[Str(content='"         X         "')])), Dispatch(body=Id(name='cells'), method='print', expr_list=[]), Let(object='countdown', type='Int', init=Int(content=20), body=While(predicate=Lt(first=Int(content=0), second=Id(name='countdown')), body=Block(body=[Dispatch(body=Id(name='cells'), method='evolve', expr_list=[]), Dispatch(body=Id(name='cells'), method='print', expr_list=[]), Assign(name=Id(name='countdown'), body=Sub(first=Id(name='countdown'), second=Int(content=1)))]))), Id(name='self')]))]
+
+Classes Base:
+
+[Method(name='abort', formal_list=[], return_type='Object', body=None), Method(name='type_name', formal_list=[], return_type='String', body=None), Method(name='copy', formal_list=[], return_type='SELF_TYPE', body=None)]
+
+[Method(name='out_string', formal_list=[('arg', 'String')], return_type='SELF_TYPE', body=None), Method(name='out_int', formal_list=[('arg', 'Int')], return_type='SELF_TYPE', body=None), Method(name='in_string', formal_list=[], return_type='String', body=None), Method(name='in_int', formal_list=[], return_type='Int', body=None)]
+
+
+[Attr(name='_val', type='_prim_slot', body=None)]
+[Attr(name='_val', type='_prim_slot', body=None)]
+[Attr(name='_val', type='Int', body=None), Attr(name='_str_field', type='_prim_slot', body=None), Method(name='length', formal_list=[], return_type='Int', body=None), Method(name='concat', formal_list=[('arg', 'String')], return_type='String', body=None), Method(name='substr', formal_list=[('arg1', 'Int'), ('arg2', 'Int')], return_type='String', body=None)]
+     
+	     
+	     
+	    
+
