@@ -625,7 +625,7 @@ def semant(ast):
     checa_ciclos_de_heranca()
     expandir_classes_herdadas()
     
-    print(inheritance_tree)
+    #print(inheritance_tree)
     
     for cl in classes_dict.values():
     #   #print(cl)
