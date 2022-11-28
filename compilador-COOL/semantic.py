@@ -130,18 +130,24 @@ def visita_arvore_de_heranca(start_class, visited):
 
 def checa_ciclos_de_heranca():
     visited = {}    # dicionário para marcar as classes visitadas
+    #print(inheritance_tree)
+    #print("\n")
+    #print(inheritance_tree.keys())
     for parent_name in inheritance_tree.keys():
         visited[parent_name] = False
         for cl_name in inheritance_tree[parent_name]:
             visited[cl_name] = False
     
-    #print(visited)
+    print(visited)
     # Executa uma travessia em profundidade do gráfico de herança, altera o dict à medida que avança
     visita_arvore_de_heranca("Object", visited)
     
+    #print("\n")
     #print(visited)
 
     for class_name,v in visited.items():
+        #print(class_name)
+        #print(v)
         if not v:
             raise SemantError("classe '%s' envolvida em um ciclo de herança" % class_name)
 
@@ -190,7 +196,7 @@ def checa_escopos_e_infere_tipos_de_retorno(cl):  # pega os valores de cada chav
 
             for formal in feature.formal_list:  # formal é uma tupla representado um parametro de um método
                 if formal in formals_seen:
-                    raise SemantError("formal '%s' no método '%s' já está definido" % (formal[0], feature.name))
+                    raise SemantError("parâmetro formal '%s' no método '%s' já está definido" % (formal[0], feature.name))
                 
                 formals_seen.add(formal)
                 variable_scopes[-1][formal[0]] = formal[1]  # {nome_attr: tipo_attr}         talvez mudar  
@@ -235,16 +241,23 @@ def analisa_expressao(expression, variable_scopes, cl):
         analisa_expressao(expression.body, variable_scopes, cl)
     
     elif isinstance(expression, Let):
-        # # LET cria um novo escopo
-        # #variable_scopes.new_scope() # alterar aqui
-        # variable_scopes.append(dict())   # alterado - adicionando novo escopo 
+        # LET cria um novo escopo
+        #variable_scopes.new_scope() # alterar aqui
+        #print(variable_scopes)
+        variable_scopes.append(dict())   # alterado - adicionando novo escopo 
+        #print(variable_scopes)
+        for scope in variable_scopes[::-1]:
+            scope[expression.object] = expression.type
+        
+        #print(variable_scopes)
         # variable_scopes[expression.object] = expression.type
-        # analisa_expressao(expression.init, variable_scopes, cl)
-        # analisa_expressao(expression.body, variable_scopes, cl)
-        # #variable_scopes.destroy_scope() 
-        # del variable_scopes[-1] # alterado
-        # expression.return_type = expression.body.return_type
-        pass
+        analisa_expressao(expression.init, variable_scopes, cl)
+        analisa_expressao(expression.body, variable_scopes, cl)
+        #variable_scopes.destroy_scope() 
+        del variable_scopes[-1] # alterado
+        #print(variable_scopes)
+        expression.return_type = expression.body.return_type    # tipo de retorno do let é o tipo do body
+        #pass
     
     elif isinstance(expression, Block):
         last_type = None
@@ -259,56 +272,70 @@ def analisa_expressao(expression, variable_scopes, cl):
         expression.return_type = expression.name.return_type  
     
     elif isinstance(expression, Dispatch) or isinstance(expression, StaticDispatch):
-        # analisa_expressao(expression.body, variable_scopes, cl)
-        # for expr in expression.expr_list:
-        #     analisa_expressao(expr, variable_scopes, cl)
+        analisa_expressao(expression.body, variable_scopes, cl)
+        for expr in expression.expr_list:
+            analisa_expressao(expr, variable_scopes, cl)
 
-        # # código redundante copiado de type_check, porque é preciso inferir o tipo
-        # # de retorno dispatch do tipo de chamada do método
+        # código redundante copiado de type_check, porque é preciso inferir o tipo
+        # de retorno dispatch do tipo de chamada do método
 
-        # if expression.body == "self":
-        #     bodycln = cl.name
-        # else:
-        #     bodycln = expression.body.return_type
+        if expression.body == "self":
+            bodycln = cl.name
+        else:
+            bodycln = expression.body.return_type
 
-        # called_method = None
+        called_method = None
         
-        # if bodycln in classes_dict:
-        #     bodycl = classes_dict[bodycln]
-        #     for feature in bodycl.feature_list:
-        #         if isinstance(feature, Method) and feature.name == expression.method:
-        #             called_method = feature
-        # if not called_method:
-        #     raise SemantError("tentativa de chamar um método indefinido '%s' na classe '%s'" % (expression.method, bodycl.name))
+        if bodycln in classes_dict:
+            bodycl = classes_dict[bodycln]
+            for feature in bodycl.feature_list:
+                if isinstance(feature, Method) and feature.name == expression.method:
+                    called_method = feature
+        if not called_method:
+            raise SemantError("tentativa de chamar um método indefinido '%s' na classe '%s'" % (expression.method, bodycl.name))
 
-        # if called_method.return_type == "SELF_TYPE":
-        #     method_type = bodycl.name
-        # else:
-        #     method_type = called_method.return_type
+        if called_method.return_type == "SELF_TYPE":
+            method_type = bodycl.name
+        else:
+            method_type = called_method.return_type
 
-        # expression.return_type = method_type
-        pass
+        expression.return_type = method_type
+        #pass
     
     elif isinstance(expression, If):
-        # analisa_expressao(expression.predicate, variable_scopes, cl)
-        # analisa_expressao(expression.then_body, variable_scopes, cl)
-        # analisa_expressao(expression.else_body, variable_scopes, cl)
-        # then_type = classes_dict[expression.then_body.return_type]
-        # else_type = classes_dict[expression.else_body.return_type]
-        # ret_type = menor_parente_comum(then_type, else_type)  
-        # expression.return_type = ret_type
-        pass
+        analisa_expressao(expression.predicate, variable_scopes, cl)
+        analisa_expressao(expression.then_body, variable_scopes, cl)
+        analisa_expressao(expression.else_body, variable_scopes, cl)
+        then_type = classes_dict[expression.then_body.return_type]
+        else_type = classes_dict[expression.else_body.return_type]
+        ret_type = menor_parente_comum(then_type, else_type)  
+        expression.return_type = ret_type
+        #pass
 
     elif isinstance(expression, Case):
-        # analisa_expressao(expression.expr, variable_scopes, cl)
-        # branch_types = []
-        # for case in expression.case_list:
-        #     #variable_scopes.new_scope()  
-        #     variable_scopes.append(dict()) # alterado - cada branch de case tem seu próprio escopo
-        #     variable_scopes[case[0]] = case[1]
-        #     analisa_expressao(case[2], variable_scopes, cl)
-        #     branch_types.append(classes_dict[case[2].return_type])
-        # expression.return_type = menor_parente_comum(*branch_types)
+        #analisa_expressao(expression.expr, variable_scopes, cl)
+        #branch_types = []
+        #print(expression.case_list)
+        #print("\n")
+        #print(variable_scopes)
+        #print("\n\n")
+        #for case in expression.case_list:
+            #variable_scopes.new_scope()  
+            #print(variable_scopes)
+            #print("\n")
+            #variable_scopes.append(dict()) # alterado - cada branch de case tem seu próprio escopo
+            #print(variable_scopes)
+            #print("\n")
+            #print(variable_scopes)
+            #for scope in variable_scopes[::-1]:
+                #scope[case[0]] = case[1]
+            
+            #variable_scopes[case[0]] = case[1]
+            #analisa_expressao(case[2], variable_scopes, cl)
+            #branch_types.append(classes_dict[case[2].return_type])
+        #expression.return_type = menor_parente_comum(*branch_types)
+        #print(branch_types)
+        #print(classes_dict)
         pass
 
     elif isinstance(expression, Id):
@@ -444,9 +471,9 @@ def type_check(cl):
         elif isinstance(feature, Method):
             for formal in feature.formal_list:
                 if formal[1] == "SELF_TYPE":
-                    raise SemantError("formal %s não pode ter o tipo SELF_TYPE" % formal[0])
+                    raise SemantError("parâmetro formal '%s' não pode ter o tipo SELF_TYPE" % formal[0])
                 elif formal[1] not in classes_dict:
-                    raise SemantError("formal %s tem um tipo indefinido" % formal[0])
+                    raise SemantError("parâmetro formal '%s' tem um tipo indefinido" % formal[0])
 
             if feature.return_type == "SELF_TYPE":
                 realrettype = cl.name
@@ -465,39 +492,43 @@ def type_check(cl):
                 returnedcln = feature.body.return_type
 
             declaredcln = realrettype
+            #print("---", declaredcln)
             if returnedcln is None:
                 warnings.warn("conteúdo não digitado para o método '%s' com tipo declarado '%s'" % (feature.name, declaredcln), SemantWarning)
             else:
                 if not is_child(returnedcln, declaredcln):
                     raise SemantError("tipo inferido '%s' para o método '%s' não coincide com o tipo declarado '%s'" % (returnedcln, feature.name, declaredcln))
-
-
+            
 
 def type_check_expression(expression, cl):
     """verificar se os tipos validam em qualquer ponto da ast"""
     if isinstance(expression, Case):
-        type_check_expression(expression.expr, cl)
-        for case in expression.case_list:
-            type_check_expression(case[2], cl)
+        # type_check_expression(expression.expr, cl)
+        # for case in expression.case_list:
+        #     type_check_expression(case[2], cl)
+        pass
     
     elif isinstance(expression, Assign):
         type_check_expression(expression.body, cl)
         if not is_child(expression.body.return_type, expression.name.return_type):
             raise SemantError("o tipo inferido '%s' para '%s' não coincide com o tipo declarado '%s'" % (expression.body.return_type, expression.name.name, expression.name.return_type))
-    
+        #pass
+
     elif isinstance(expression, If):
         type_check_expression(expression.predicate, cl)
         type_check_expression(expression.then_body, cl)
         type_check_expression(expression.else_body, cl)
         if expression.predicate.return_type != "Bool":
             raise SemantError("declarações IF devem ter condições booleanas")
+        pass
     
     elif isinstance(expression, Let):
         type_check_expression(expression.init, cl)
         if expression.init:  # algumas expressões let auto-initializam com valores padrão
             if not is_child(expression.init.return_type, expression.type):
                 raise SemantError("o tipo inferido '%s' para let init não coincide com o tipo declarado '%s'" % (expression.init.return_type, expression.type))
-    
+        #pass
+
     elif isinstance(expression, Block):
         for line in expression.body:
             type_check_expression(line, cl)
@@ -512,7 +543,7 @@ def type_check_expression(expression, cl):
         if isinstance(expression, StaticDispatch):
             # checagem adicional em static dispatch
             if not is_child(bodycln, expression.type):
-                raise SemantError("expressão static dispatch (antes @Type) não coincide com o tipo declarado {}".format(expression.type))
+                raise SemantError("expressão static dispatch (antes de @Type) não coincide com o tipo declarado {}".format(expression.type))
 
         called_method = None
         if bodycln in classes_dict:
@@ -521,20 +552,21 @@ def type_check_expression(expression, cl):
                 if isinstance(feature, Method) and feature.name == expression.method:
                     called_method = feature
         if not called_method:
-            raise SemantError("Tentativa de chamar um método indefinido %s na classe %s" % (expression.method, bodycl.name))
+            raise SemantError("tentativa de chamar um método indefinido '%s' na classe '%s'" % (expression.method, bodycl.name))
         if len(expression.expr_list) != len(called_method.formal_list):
-            raise SemantError("Tentativa de chamar o método {} na classe {} com o número incorreto de argumentos".format(called_method.name, bodycl.name))
+            raise SemantError("tentativa de chamar o método '{}' na classe '{}' com o número incorreto de argumentos".format(called_method.name, bodycl.name))
         else:
             # checar se os argumentos coincidem
             for expr, formal in zip(expression.expr_list, called_method.formal_list):
                 if not is_child(expr.return_type, formal[1]):
-                    raise SemantError("Argumento {} passado para o método {} na classe {} não coincide com sua {} declaração".format(expr.return_type, called_method.name, bodycl.name, formal[1]))
-    
+                    raise SemantError("argumento '{}' passado para o método '{}' na classe '{}' não coincide com sua declaração '{}'".format(expr.return_type, called_method.name, bodycl.name, formal[1]))
+        #pass
+
     elif isinstance(expression, While):
         type_check_expression(expression.predicate, cl)
         type_check_expression(expression.body, cl)
         if expression.predicate.return_type != "Bool":
-            raise SemantError("Declaração While deve ter condições booleanas")
+            raise SemantError("declaração While deve ter condições booleanas")
     
     elif isinstance(expression, Isvoid):
         type_check_expression(expression.body, cl)
@@ -542,24 +574,24 @@ def type_check_expression(expression, cl):
     elif isinstance(expression, Not):
         type_check_expression(expression.body, cl)
         if expression.body.return_type != "Bool":
-            raise SemantError("Declaração NOT requer valores booleanos")
+            raise SemantError("declaração NOT requer valores booleanos")
     
     elif isinstance(expression, Lt) or isinstance(expression, Le):
             type_check_expression(expression.first, cl)
             type_check_expression(expression.second, cl)
             if expression.first.return_type != "Int" or expression.second.return_type != "Int":
-                raise SemantError("Argumentos não inteiros não podem ser verificados com < == ou <=")
+                raise SemantError("argumentos NÃO inteiros não podem ser verificados com < == ou <=")
         
-    elif isinstance(expression, Complement):
+    elif isinstance(expression, Neg):
         type_check_expression(expression.body, cl)
         if expression.body.return_type != "Int":
-            raise SemantError("Declaração negativa requer valores inteiros")
+            raise SemantError("declaração negativa requer valores inteiros")
     
     elif any(isinstance(expression, X) for X in [Plus, Sub, Mult, Div]):
         type_check_expression(expression.first, cl)
         type_check_expression(expression.second, cl)
         if expression.first.return_type != "Int" or expression.second.return_type != "Int":
-            raise SemantError("Operações aritiméticas requerem inteiros")
+            raise SemantError("operações aritiméticas requerem inteiros")
     
     elif isinstance(expression, Eq):
         type_check_expression(expression.first, cl)
@@ -571,7 +603,8 @@ def type_check_expression(expression, cl):
            (type1 == "String" and type2 == "String"):
             pass  # comparar tipos básicos juntos ok 
         else:
-            raise SemantError("A comparação somente é possível entre os mesmos tipos base")
+            raise SemantError("a comparação somente é possível entre os mesmos tipos base")
+        #pass
 
 
 def is_child(childclname, parentclname):
@@ -592,6 +625,8 @@ def semant(ast):
     checa_ciclos_de_heranca()
     expandir_classes_herdadas()
     
+    print(inheritance_tree)
+    
     for cl in classes_dict.values():
     #   #print(cl)
     #   print("\n\n")
@@ -600,10 +635,10 @@ def semant(ast):
 
     #print(classes_dict)
     # print("\n\n")
-    # for cl in classes_dict.values():
-    #     #type_check(cl)
-    #     print(cl.feature_list)
-    #     print("\n")
+    for cl in classes_dict.values():
+        type_check(cl)
+        #print(cl.feature_list)
+        #print("\n")
     # #return classes_dict  
     #print(classes_dict)
 
