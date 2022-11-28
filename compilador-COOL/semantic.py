@@ -138,7 +138,7 @@ def checa_ciclos_de_heranca():
         for cl_name in inheritance_tree[parent_name]:
             visited[cl_name] = False
     
-    print(visited)
+    #print(visited)
     # Executa uma travessia em profundidade do gráfico de herança, altera o dict à medida que avança
     visita_arvore_de_heranca("Object", visited)
     
