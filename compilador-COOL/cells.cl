@@ -1,13 +1,13 @@
 class CellularAutomaton inherits IO {
     population_map : String;
-   
+
     init(map : String) : SELF_TYPE {
         {
             population_map <- map;
             self;
         }
     };
-   
+
     print() : SELF_TYPE {
         {
             out_string(population_map.concat("\n"));
@@ -21,6 +21,7 @@ class CellularAutomaton inherits IO {
    
     cell(position : Int) : String {
         population_map.substr(position, 1)
+
     };
    
     cell_left_neighbor(position : Int) : String {
@@ -39,8 +40,6 @@ class CellularAutomaton inherits IO {
         fi
     };
    
-    (* a cell will live if exactly 1 of itself and it's immediate
-       neighbors are alive *)
     cell_at_next_evolution(position : Int) : String {
         if (if cell(position) = "X" then 1 else 0 fi
             + if cell_left_neighbor(position) = "X" then 1 else 0 fi
@@ -71,6 +70,7 @@ class CellularAutomaton inherits IO {
     };
 };
 
+
 class Main {
     cells : CellularAutomaton;
    
@@ -78,6 +78,7 @@ class Main {
         {
             cells <- (new CellularAutomaton).init("         X         ");
             cells.print();
+            
             (let countdown : Int <- 20 in
                 while 0 < countdown loop
                     {
