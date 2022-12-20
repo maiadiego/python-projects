@@ -5,4 +5,4 @@
 
 **programacao-cientifica**
 
-  Aqui foram elaborados notebooks que visam resolver alguns problemas comuns na Física utilizando algumas bibliotecas do Python como a Numpy, SciPy e Matplotlib, bem como algumas funções para resolver equações diferenciais e cálculos relacionados a cada problema.
+  Aqui foram elaborados notebooks que visam resolver alguns problemas comuns na Física utilizando algumas bibliotecas do Python, como a Numpy, SciPy e Matplotlib, bem como algumas funções para resolver equações diferenciais e cálculos relacionados a cada problema.
