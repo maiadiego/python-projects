@@ -6,4 +6,4 @@
 
 **4:** Observação da trajetória de uma partícula elétrica carregada em um campo elétrico uniforme cruzado com um campo magnético.
 
-**5:** Em um sistema caótico, o comportamento futuro do pêndulo é altamente sensível aos valores das condições iniciais, ou seja, qualquer mudança nas condições iniciais pode causar grandes mudanças em um curto intervalo de tempo. Neste código, vamos verificar essas considerações.
+**5:** Em um sistema caótico, o comportamento futuro de um pêndulo é altamente sensível aos valores das condições iniciais, ou seja, qualquer mudança nas condições iniciais pode causar grandes mudanças em um curto intervalo de tempo. Neste código, vamos verificar essas considerações.
