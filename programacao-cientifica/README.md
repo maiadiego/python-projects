@@ -6,4 +6,4 @@
 
 4: 
 
-5: Em um sistema caótico, o comportamento futuro do pêndulo é altamente sensível aos valores das condições iniciais, ou seja, qualquer mudança nas condições iniciais pode causar grandes mudanças em um curto intervalo de tempo. Neste código vamos verificar essas consideraç
+5: Em um sistema caótico, o comportamento futuro do pêndulo é altamente sensível aos valores das condições iniciais, ou seja, qualquer mudança nas condições iniciais pode causar grandes mudanças em um curto intervalo de tempo. Neste código, vamos verificar essas considerações.
