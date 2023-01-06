@@ -1,4 +1,4 @@
-##Descrição dos projetos
+## DESCRIÇÃO DOS PROJETOS
 
 **compilador-COOL** 
   
