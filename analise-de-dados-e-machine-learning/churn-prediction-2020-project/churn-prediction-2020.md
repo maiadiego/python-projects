@@ -74,9 +74,111 @@ Clientes com código de área 415 possuem uma taxa de churn ligeiramente maior d
 
 Com base no último gráfico, vemos que há uma diferença mais significativa com relação ao churn entre os clientes que não possuem plano de correio de voz e os que possuem.
 
-A seguir, vamos agrupar a média e a mediana em relação aos clientes que entraram em churn (yes) e os que não entraram (no). Em seguida, iremos visualizar a distribuição de algumas variáveis de acordo com essas duas categorias
+![11](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/11..png)
+
+![12](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/12..png)
+
+Notamos que as duas categorias possuem distribuições muito parecidas para diferentes variáveis, sendo, no geral, aproximações de distribuição normal.
+
+Tendo adquirido um entendimento melhor de como os dados estão distribuídos, seguiremos para a etapa de construção dos modelos. Vamos observar como os classificadores se comportam com essas distribuições.
+
+## 2. Aplicando diferentes modelos de classificação
+
+É possível notar que o dataset está em um estado de desbalanceamento, isto é, a quantidade de clientes que não entraram em churn é muito maior dos que entraram, e possui features com pequenas nuances de classificação, podendo ser difícil para um modelo de classificação distinguir entre as duas classes.
+
+### 2.1 Logistic Regression
+
+Em primeiro momento, vamos utilizar o modelo de Regressão Logística e a técnica de validação cruzada para avaliar como o modelo se comporta com relação aos dados de treinamento. Em seguida, vamos saber como o modelo generaliza para os dados de teste ainda não vistos.
+
+![13](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/13..png)
+
+![14](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/14..png)
+
+O desempenho do modelo na validação cruzada de 5 folds teve um desempenho bom de acurácia média, porém um desempenho muito ruim nas outras métricas, especialmente no recall. Isso ocorre porque em casos de datasets muito desbalanceados, como esse em que a maioria dos clientes estão classificados como 0 (não churn), o modelo apresenta uma alta acurácia simplesmente prevendo a classe majoritária, e não leva em conta a classe minoritária que é o principal interesse nesse caso. Logo, a acurácia não é um bom indicador de desempenho do modelo nessa situação.
+
+O recall e a precisão apresentaram scores muito ruins na validação cruzada e ainda piores nos dados teste.
+
+A matriz de confusão nos mostra que: 692 amostras foram classificadas corretamente como não-churn (verdadeiro negativo); 28 amostras foram classificadas corretamente como churn (verdadeiro positivo); 92 amostras foram erroneamente classificadas como não-churn (falso negativo); 32 amostras de não-churn foram erroneamente classificadas como churn (falso positivo).
+
+#### Ajustando hiperparâmetros da RegLog
+
+Com o objetivo de tentar obter um valor de recall mais alto para que o modelo preveja mais valores da classe minoritária, vamos tentar ajustar os hiperparâmetros da Regressão Logística
+
+Primeiro vamos visualizar como a curva de validação em relação ao recall se comporta quando variamos os parâmetros 'C' e 'max_iter'
+
+![15](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/15..png)
+
+![16](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/16..png)
+
+A sombra que é plotada na área preenchida representa o intervalo de confiança para a variação da pontuação do modelo entre as diferentes dobras de validação cruzada. Essa faixa sombreada é comumente usada para indicar a incerteza associada à estimativa da pontuação do modelo.
+
+Vamos utilizar o StratifiedKFold para que a proporção de amostras de cada classe seja preservada em cada fold. Essa é uma abordagem mais adequada em problemas de classificação com dados desbalanceados.
+
+Em seguida, vamos usar o GridSearchCV para tentar econtrar uma combinação de parâmetros que seja adequada para maximizar o recall
+
+![17](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/17..png)
+
+![18](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/18..png)
+
+![19](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/19..png)
+
+Observamos que a busca pelos melhores hiperparâmetros de fato maximizou o recall, porém, às custas da precisão. Isto é, o modelo classificou muito mais falsos positivos do que no caso anterior, decaindo, assim, a precisão e, consequentemente, o f1 score.
+
+#### Aplicando SMOTE
+Agora vamos tentar aplicar a técnica de oversampling SMOTE que consiste em criar novas amostras sintéticas da classe minoritária a partir das amostras já existentes a fim de balancear o conjunto de dados
+
+![20](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/20..png)
+
+![21](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/21..png)
+
+![22](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/22..png)
+
+O modelo treinado com o SMOTE e o grid search superestimou a classe positiva quando aplicado nos dados de teste. É possível que a configuração de parâmetros encontrada pelo GridSearchCV seja muito específica para o conjunto de treinamento, levando a um overfitting do modelo.
+
+#### Adicionando algumas features
+Como o SMOTE não se adequou bem a esse problema, vamos adicionar mais algumas features no conjunto de dados para tentar ajudar o modelo a entender as nuances da variável alvo.
+
+Features adicionadas
+
+'prop_minutos_dia': proporção de chamadas feitas durante o dia em relação ao total de chamadas.
+
+'total_chams': total de chamadas feitas por cliente considerando chamadas noturnas, internacionais, etc.
+
+'total_minutos': total de minutos gastos.
+
+'avg_minutes_per_call': média de minutos por ligação.
+
+'range_num_meses_prov_atual': faixas de valores para a coluna 'num_de_meses_prov_atual' ['0-25', '26-50', '51-75', '76-100', '+100']
+
+'avg_cobr_dia_por_min': média de cobrança dia por minuto.
+
+'avg_cobr_notu_por_min': média de cobrança noturna por minuto.
+
+'avg_cobr_noit_por_min': média de cobrança noite por minuto.
+
+'avg_cobr_inter_por_min': média de cobrança internacional por minuto.
+
+![23](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/23..png)
+
+![24](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/24..png)
+
+Embora a adição de algumas features tenha melhorado razoavelmente a performance do modelo, a precisão e o recall ainda ficaram abaixo de um valor razoável.
+
+Vamos avaliar a performance de outros modelos mais robustos para lidar com a questão do desbalanceamento
+
+### 2.2 Decision Tree
+![25](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/25..png)
 
 ![]()
 
 ![]()
 
+![]()
+
+![]()
+
+![]()
+
+![]()
+
+![]()
