@@ -227,6 +227,9 @@ A utilização de modelos mais avançados como Gradient Boosting e Redes Neurais
 ## Referências 
 
 [1]. Rahim Baig, Mirza, et al. Data Science for Marketing Analytics. 2st ed. Birmingham B3 2PB, UK: Packt Publishing Ltd, 2021.
+
 [2]. https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
+
 [3]. https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
+
 [4]. https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
