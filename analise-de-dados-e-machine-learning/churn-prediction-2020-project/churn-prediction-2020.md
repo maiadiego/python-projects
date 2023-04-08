@@ -169,16 +169,64 @@ Vamos avaliar a performance de outros modelos mais robustos para lidar com a que
 ### 2.2 Decision Tree
 ![25](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/25..png)
 
-![]()
+![26](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/26..png)
 
-![]()
+Percebemos uma melhora no equilibro entre precisão e recall, além de uma melhoria na precisão e recall em relação a classe 0, e também na acurácia total do modelo. Porém, ainda há espaço para tentar melhorar os valores em relação à classe 1.
 
-![]()
+Vamos visualizar como essas métricas se comportam com a variação de alguns hiperparâmetros importantes da árvore de decisão
 
-![]()
+![27](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/27..png)
 
-![]()
+![28](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/28..png)
 
-![]()
+![29](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/29..png)
 
-![]()
+Agora que temos uma base dos valores dos parâmetros que maximizam cada métrica, vamos fazer uma busca no GridSearchCV para achar uma combinação que maximize o recall
+
+![30](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/30..png)
+
+![31](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/31..png)
+
+![32](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/32..png)
+
+Observamos que a média de recall na validação cruzada foi de 0.73, e nos dados de teste o modelo acertou 71% das previsões positivas corretamente, não muito diferente da versão anterior. A precisão para a classe 1, no entanto, teve uma melhora significativa com o ajuste, tornando-se um pouco melhor do que a versão anterior.
+
+Por fim, vamos analisar o desempenho do modelo de floresta aleatória e ver como ele se comporta
+
+### 2.3 Random Forest
+
+![33](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/33..png)
+
+![34](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/34..png)
+
+Vemos que o Random Forest obteve 0.99 de precisão para a classe 1 e recall máximo para a classe 0 nos dados de teste. Entretanto, o recall para a classe 1 se mostrou um pouco abaixo se comparado com a Árvore de Decisão.
+
+Vamos aplicar a técnica de balanceamento SMOTETomek dessa vez. Ela combina o algoritmo SMOTE com o algoritmo Tomek Links, tendo por objetivo gerar novas amostras sintéticas da classe minoritária e em seguida remover as amostras da classe majoritária que estão próximas a amostras da classe minoritária.
+
+Vamos usar também a técnica de RepeatedStratifiedKFold para a validação cruzada. A vantagem em relação à StratifiedKFold é que a RepeatedStratifiedKFold realiza a validação cruzada várias vezes, criando uma divisão aleatória do conjunto de dados em cada repetição, ajudando a reduzir a variância do processo.
+
+![35](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/35..png)
+
+![36](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/36..png)
+
+#### Ajustando alguns hiperparâmetros
+
+![37](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/37..png)
+![38](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/churn-prediction-2020-project/imagens-churn-prediction-2020/38..png)
+
+## Avaliação dos resultados
+
+Com relação aos modelos utilizados, enquanto a Regressão Logística apresentou baixa performance para o problema de desbalanceamento de classes, a Árvore de Decisão e o Random Forest conseguiram lidar um pouco melhor com esse problema, sendo o Random Forest o modelo que melhor conseguiu equilibrar o trade-off entre recall e precisão com um valor razoável em relação a classe positiva, fazendo o uso da técnica de over-sampling e ajustando alguns hiperparâmetros.
+
+## Conclusão
+
+Ao final deste projeto, pudemos observar, de modo geral, que os três modelos tiveram suas dificuldades em detectar a classe positiva, o que nos leva a considerar a importância do tratamento de dados desbalanceados em problemas de classificação e a utilização de modelos mais avançados e robustos. A falta de representatividade de uma classe pode levar a modelos tendenciosos e com baixa capacidade de generalização. No entanto, ainda que com valores não totalmente satisfatórios de recall, o modelo de Random Forest, a exemplo, pode ser utilizado para ajudar a reter uma certa quantidade de faturamento para a empresa em questão. Isto é, uma porcentagem de 80 no recall e 96 na acurácia pode reter 'x' milhões de faturamento, bem como uma porcentagem de 90 no recall reterá 'y' milhões, e assim por diante.
+
+A utilização de modelos mais avançados como Gradient Boosting e Redes Neurais pode ser utilizado para avaliação de performance nesse conjunto de dados, visto que são classificadores que lidam bem com o problema de desbalanceamento, porém essa abordagem está fora do escopo desse projeto. 
+
+## Referências 
+
+[1]. Rahim Baig, Mirza, et al. Data Science for Marketing Analytics. 2st ed. Birmingham B3 2PB, UK: Packt Publishing Ltd, 2021.
+[2]. https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
+[3]. https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
+[4]. https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
