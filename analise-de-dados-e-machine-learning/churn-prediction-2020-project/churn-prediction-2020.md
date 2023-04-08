@@ -1,3 +1,4 @@
+# Churn Prediction
 ## Problema de negócio
 O *customer churn*, também conhecido como rotatividade de clientes, é um problema que ocorre quando os clientes param de fazer negócios com uma empresa. Isso pode acontecer por uma variedade de razões, como preços altos, problemas de atendimento ao cliente, baixa qualidade do produto ou serviço, entre outros. O churn pode ser particularmente problemático para as empresas, pois a aquisição de novos clientes pode ser mais cara do que manter os já existentes. Portanto, entender as razões pelas quais os clientes estão deixando a empresa e identificar aqueles com maior probabilidade de deixá-la pode ser crucial para reduzir o churn e manter o faturamento que os clientes geram. A análise de dados e a modelagem preditiva podem ajudar a prever o churn dos clientes e ajudar uma empresa a agir antecipadamente a fim de evitar que eles saiam.
 
