@@ -25,16 +25,42 @@ Foram utilizados os modelos **ARIMA** e **SARIMAX**.
 O notebook com o código completo do projeto se encontra em: 
 
 ## 1. Análise exploratória dos dados 
+Os dados fornecidos possuem quatro datasets a serem explorados: **sales_df**, **stores_df**, **oil_df** e **holidays_df**.
+O primeiro dataset, sales_df, possui colunas informando id, data, número da loja, categoria, receita e quantidade de produtos em promoção relacionados a uma determinada venda.  
 ![sales_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/1.png)
+O dataset stores_df possui informações acerca da cidade e o estado em que uma determinada loja está situada, bem como o seu tipo e o número do cluster ao qual pertence.
 ![stores_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/2.png)
+O dataset oil_df possui as variações do preço do petróleo ao longo do tempo. Como o Equador é um país produtor de petróleo, o a alta no preço do óleo pode afetar o preço final das mercadorias vendidas pela varejista, isto é, devido aos custos de produção, custos de transporte, condições econômicas gerais, entre outros.
 ![oil_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/3.png)
+Já holidays_df possui especificações de todos os feriados ocorridos dentro do período em questão, lembrando que os feriados podem mudar o padrão de comportamento do consumidor e gerar comportamentos sazonais nas vendas.
 ![holidays_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/4.png)
+
+Todos os datasets compreendem o período entre os anos de 2013 a 2017.
+
+Vamos checar como estão distribuídas as categorias dos produtos vendidos pela varejista
 ![sales_cat](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/5.png)
+Vemos que grande parte das vendas se concentra em produtos de mercado e mercearia, bem como no setor de bebidas.
+
+A varejista se divide em clusters, isto é, agrupamento de lojas com características semelhantes com base em diferentes critérios, como localização, perfil demográfico dos clientes, comportamento de compra, concorrência local, entre outros. O objetivo de criar clusters é segmentar as lojas em grupos distintos para entender melhor o desempenho de cada grupo e desenvolver estratégias mais eficazes para alocar recursos, entender o ambiente competitivo local, analisar desempenho e traçar metas de expansão.
+
+Como um insight inicial, vamos visualizar qual foi a média de vendas de cada cluster 
 ![cluster-mean](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/6.png)
+Vemos que o cluster 5 possui uma grande performance em relação às vendas.
+
+Vamos como os clusters estão distribuídos entre a cidades e a margem de vendas de cada um
 ![cluster_at](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/7.png)
+Observamos que os clusters com maior concentração de vendas ficam na capital, Quito.
 ## 2. Análise das séries temporais
+Vamos explorar explorar as séries de vendas em termos de anos disponíveis
 ![s_1](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/8.png)
+Observamos que o ano de 2014 teve um aumento considerável na margem das vendas em relação ao ano anterior, porém com um comportamento instável. No segundo semestre de 2015 a margem de vendas subiu e se manteu estável, repetindo o comportamento para os anos de 2016 e 2017.
+
+A fim de obter uma amostra dos dados menor e mais estável, vamos trabalhar somente com os dados do ano de 2016, filtrando pela categoria de bebidas, em rezão dos valores estarem em um escala não tão discrepante.
 ![s_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/9.png)
+É possível notar um padrão sazonal claro nos dados, o que fica mais evidente quando filtramos somente para os meses de janeiro e fevereiro
+
+
+
 ![s_3](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/10.png)
 ![s_4](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/10b.png)
 ![s_5](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/10c.png)
