@@ -95,11 +95,37 @@ Durante meados de maio e começo de julho o preço do óleo teve grande aumento,
 
 ![s_5](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/10c.png)
 
-Ao marcar os dias de feriados, vemos que entre abril e maio houve uma grande concentração de feriados, fazendo as vendas alcancarem uma margem que não foi observada em nenhum ciclo sazonal posterior.
+Ao marcar os dias de feriados, vemos que entre abril e maio houve uma grande concentração de feriados, fazendo as vendas alcancarem uma margem que não foi observada em nenhum ciclo sazonal subsequente.
+
+Vamos decompor a série em tendência, sazonalidade e resíduos 
 
 ![s_6](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/11.png)
+
+Como vemos, o primeiro gráfico é o valor real(observado) da série. No gráfico de tendência, é possível notar que não há nenhuma tendência constante ao longo dos anos. No gráfico sazonal, vemos qual a forma dos ciclos sazonais presentes, como observamos no gráfico mais acima. Com relação ao componente residual, ele representa a variação aleatória dos dados. É importante que não tenha nenhum padrão ou sazonalidade nos resíduos, tenham média zero e variação constante ao longo do tempo.
+
+O gráfico de autocorrelação (ACF) ajuda a identificar a presença de correlação entre os valores passados de uma série temporal e os valores atuais. Ele mostra como a série está correlacionada consigo mesma em diferentes defasagens.
+
 ![s_7](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/12.png)
+
+A presença de autocorrelação positiva em três defasagens seguidas seguida por autocorrelação negativa em quatro defasagens sugere um padrão cíclico recorrente na série temporal, mais especificamente, um período de sete dias, como vimos anteriormente. Isso pode indicar que os valores em uma semana são correlacionados positivamente com os valores três semanas anteriores, e correlacionados negativamente com os valores quatro semanas anteriores. 
+
+Em relação às correlações positivas, uma correlação significativamente maior na defasagem do meio, em comparação com as duas defasagens, pode indicar a presença de um padrão específico na série temporal. Essa defasagem em destaque pode ter um efeito mais forte e relevante na previsão da série.Existem algumas possibilidades para esse padrão. Pode ser que haja um evento sazonal recorrente ou uma tendência específica que ocorre em uma determinada defasagem. Também pode ser uma indicação de que a série temporal tem uma dependência mais forte em uma defasagem específica, o que significa que a observação atual está correlacionada com uma observação passada exatamente nessa defasagem.
+
+Quando as autocorrelações estão dentro da faixa de confiança, isso indica que não há evidências estatísticas suficientes para concluir que essas autocorrelações são diferentes de zero. Portanto, elas são consideradas não significativas. Por outro lado, quando as autocorrelações extrapolam a faixa de confiança, isso indica que elas são estatisticamente significativas e sugerem uma dependência temporal na série.
+
+No contexto do  gráfico de autocorrelação, se as autocorrelações diminuem e entram dentro da faixa de confiança à medida que os lags aumentam, isso sugere que a dependência temporal na série se torna menos relevante à medida que o tempo avança. Em outras palavras, lags mais distantes têm autocorrelações não significativas, o que indica uma menor influência do passado distante na série temporal.
+
+Com base no gráfico acima, temos um  SAR (Seasonal AutoRegressive).
+
+O PACF (Partial Autocorrelation Function) ajuda a identificar os termos autorregressivos significativos que contribuem para a estrutura da série temporal. 
+
 ![s_8](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/13.png)
+
+As correlações são significativas nos primeiros lags e depois diminuem, tornando-se pouco significativas e dentro da faixa de confiança a partir do lag 20, isso pode indicar que há uma estrutura de autocorrelação significativa nos primeiros lags da sua série temporal, mas essa autocorrelação diminui à medida que as defasagens aumentam.
+A diminuição das correlações e sua entrada na faixa de confiança a partir do lag 20 indicam que as defasagens mais distantes não possuem uma influência significativa na série temporal.
+Portanto, com base no gráfico de autocorrelação parcial, um modelo AR com um número relativamente baixo de termos autorregressivos (provavelmente dentro dos primeiros lags significativos) pode ser suficiente para modelar e prever a série temporal.
+
+
 ## 3. Modelagem e previsão
 ![adf_1](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/14.png)
 
