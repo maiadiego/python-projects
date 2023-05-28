@@ -28,7 +28,7 @@ O notebook com o código completo do projeto se encontra em:
 Os dados fornecidos possuem quatro datasets a serem explorados: **sales_df**, **stores_df**, **oil_df** e **holidays_df**.
 O primeiro dataset, sales_df, possui colunas informando id, data, número da loja, categoria, receita e quantidade de produtos em promoção relacionados a uma determinada venda.  
 
-![sales_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/1.png)
+![sales_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/1.png "sdjkasjdasjkldjakljskdjakjdkljaklsdjklajjadklj")
 
 O dataset stores_df possui informações acerca da cidade e o estado em que uma determinada loja está situada, bem como o seu tipo e o número do cluster ao qual pertence.
 
@@ -127,14 +127,55 @@ Portanto, com base no gráfico de autocorrelação parcial, um modelo AR com um 
 
 
 ## 3. Modelagem e previsão
+
+O teste ADF (Augmented Dickey-Fuller) é um teste estatístico usado para determinar se uma série temporal possui raiz unitária, o que indica a presença de tendência não estacionária nos dados. Esse teste é comumente usado para avaliar a estacionariedade de uma série temporal antes de aplicar modelos de séries temporais.
+
+No teste ADF, a hipótese nula (H0) assume que a série temporal possui uma raiz unitária e, portanto, não é estacionária. Se o valor-p calculado no teste for menor que um determinado nível de significância pré-definido (geralmente 0,05), a hipótese nula é rejeitada, o que indica que a série é estacionária. Por outro lado, se o valor-p for maior que o nível de significância, não há evidências suficientes para rejeitar a hipótese nula, indicando que a série é não estacionária.
+
 ![adf_1](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/14.png)
+
+No teste acima, vemos que o p-value(0.13) é maior que o nível de significância 0.05, indicando que a série é não estacionária.
+
+Para lidar com isso, vamos aplicar o processo de diferenciação, que é uma técnica comumente utilizada para transformar uma série temporal não estacionária em uma série estacionária. Envolve subtrair valores consecutivos da série temporal original, o que resulta em uma nova série composta pelas diferenças entre os valores. O objetivo é remover a tendência e a sazonalidade presente nos dados, tornando a série estacionária.
 
 ![adf_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/15.png)
 
+Após aplicar a diferenciação, o p-value se tornou muito menor que o nível de significância, concluindo que agora a série é estacionária.
+
+### 3.1 ARIMA
+O proxímo passo é escolher um modelo que gere o menor AIC a partir dos parâmetros fornecidos.
+
+O AIC (Akaike Information Criterion) é uma métrica utilizada para comparar diferentes modelos estatísticos e determinar qual deles apresenta o melhor equilíbrio entre ajuste aos dados e complexidade do modelo. O AIC é baseado na ideia de que um bom modelo deve fornecer um bom ajuste aos dados, mas também deve ser o mais parcimonioso possível, ou seja, não deve ser excessivamente complexo. Quanto menor o valor do AIC, melhor é o modelo, indicando um bom ajuste aos dados com menor complexidade.
+
+Usaremos uma função para treinar um modelo ARIMA com diferentes valores de p e q, parâmetros do ARIMA, a fim de visualizar qual que gera o menor AIC. 
+
+O dataframe abaixo nos mostra o resultado
+
 ![aic_1](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/16.png)
 
+Vemos que os parâmetros p=7 e q=7 gerou o menor AIC entre o range de valores, indicando que, dentre os modelos treinados, o que possui melhor equilíbrio entre ajuste e complexidade é aquele com os parâmetros p e q setados em 7.
+
+Antes de fazer as previsões, é necessário fazer uma análise residual no nosso modelo a fim de verificar se os nossos resíduos são classificados como ruído branco, isto é, se eles não estão correlacionados e são apenas flutuações aleatórias restantes que não podem ser modeladas.
+
 ![res_1](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/17.png)
+
+O primeiro gráfico mostra os resíduos do modelo ao longo do tempo. Espera-se que os resíduos sejam aproximadamente aleatórios, com média zero e variância constante. Se houver algum padrão nos resíduos, como tendência ou sazonalidade remanescente, isso pode indicar que o modelo não está capturando adequadamente a estrutura dos dados.
+
+O histograma dos resíduos é plotado para verificar se eles seguem uma distribuição normal. Idealmente, os resíduos devem se aproximar de uma distribuição normal com média zero. Desvios significativos da normalidade podem indicar a presença de padrões não capturados pelo modelo.
+
+O gráfico de densidade dos resíduos gráfico exibe a estimativa da densidade dos resíduos em comparação com uma distribuição normal teórica. Se os resíduos estiverem próximos da curva normal teórica, isso sugere que o modelo está capturando adequadamente a distribuição dos dados. Se os resíduos se aproximarem de uma reta que fica perto de y=x, então os resíduos se aproximam de uma distribuição normal.
+
+Por fim, o gráfico de autocorrelação dos resíduos nos mostra as autocorrelações dos resíduos em diferentes defasagens. Espera-se que as autocorrelações sejam próximas de zero e não apresentem padrões significativos.
+
+Ao analisar os quatro gráficos em conjunto, vamos que os resíduos se aproximam de uma distribuição normal no geral, apesar de não ser uma distribuição normal perfeita.
+
+Por fim, vamos aplicar o teste Ljung-Box. Ele é um teste estatístico utilizado para avaliar a autocorrelação residual em um modelo. É aplicado aos resíduos do modelo e é útil para verificar se há autocorrelação serial não capturada pelo modelo. A hipótese nula em relação ao teste afirma que os dados são independentemente distribuídos, o que significa que não há autocorrelação. Se o p-value for maior que 0.05, nós não podemos rejeitar a hipótese nula, significando que os resíduos são independentemente distribuídos e o modelo está pronto para fazer previsões.
+
 ![lb_1](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/18.png)
+
+Na figura acima, vemos que todos os valores de lb_pvalue dentro de um range de 10 lags são maiores que 0.05, o que significa que nosso modelo está pronto para fazer previsões.
+
+### 3.2 SARIMAX
 ![ex_data](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/19.png)
 ![aic_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/20.png)
 ![res_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/21.png)
