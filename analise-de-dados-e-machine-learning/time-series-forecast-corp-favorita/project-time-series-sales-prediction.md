@@ -28,7 +28,7 @@ O notebook com o código completo do projeto se encontra em:
 Os dados fornecidos possuem quatro datasets a serem explorados: **sales_df**, **stores_df**, **oil_df** e **holidays_df**.
 O primeiro dataset, sales_df, possui colunas informando id, data, número da loja, categoria, receita e quantidade de produtos em promoção relacionados a uma determinada venda.  
 
-![sales_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/1.png "sdjkasjdasjkldjakljskdjakjdkljaklsdjklajjadklj")
+![sales_df](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/1.png) 
 
 O dataset stores_df possui informações acerca da cidade e o estado em que uma determinada loja está situada, bem como o seu tipo e o número do cluster ao qual pertence.
 
@@ -176,22 +176,40 @@ Por fim, vamos aplicar o teste Ljung-Box. Ele é um teste estatístico utilizado
 Na figura acima, vemos que todos os valores de lb_pvalue dentro de um range de 10 lags são maiores que 0.05, o que significa que nosso modelo está pronto para fazer previsões.
 
 ### 3.2 SARIMAX
+Vamos agora examinar a performance do modelo SARIMAX utilizando variáveis exógenas. Como vimos na nossa análise anterior, as vendas no varejo podem ser afetadas por diferentes fatores, incluindo feriados, flutuações no preço do óleo, comportamento do consumidor, qualidade do produto, etc. Por conta disso, vamos selecionar algumas variáveis exógenas fornecidas na fonte de dados para passar para o modelo e tentar melhorar as previsões.
+
+Filtramos um dataset contendo as colunas feriado, preço do óleo e a quantidade de produtos em promoção para um certo dia dentro do ano de 2016.
+
 ![ex_data](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/19.png)
+
+Vamos checar quais parâmetros de p, q, P e Q nos gera o menor AIC
+
 ![aic_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/20.png)
+
+Checando a análise residual
+
 ![res_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/21.png)
+
 ![lb_2](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/22.png)
+
+Podemos ver que nos lags de 2 a 6 os p-values são menores que 0.05, indicando que ainda pode haver correlação entre os resíduos. No entanto, os últimos valores são maiores que 0.05 e, observando o gráfico de correlação residual, esse caso não nos impede necessariamente de fazer previsões, só nos diz que talvez o modelo não tenha capturado todos os padrões dentro dos dados de treinamento.
+
+Vamos ver agora como as previsões se comportam para alguns meses do segundo semestre de 2016 com base nos dados de treinamento do primeiro semestre.
+
 ![pred](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/23.png)
+
 ![mape](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/img/24.png)
 
 ## Avaliação dos resultados
+Vemos que, de fato, o ARIMA se ajustou um pouco melhor nesse caso, e o SARIMAX acabou superestimando as previsões em alguns pontos. O MAPE nos informa o percentual médio que as previsões se afastaram dos valores reais. A diferença de 2% pode ser muito importante num contexto de negócio que envolve milhares de dólares, por exemplo. No contexto da varejista que estamos tratando, essa diferença pode significar estoques superabastecidos ou até mesmo a falta de produtos para uma alta demanda.
+
 ## Conclusão
+Alguns insights interessantes que podemos extrair dessa análise é que prever vendas no varejo para uma quantidade longa no futuro pode ser desafiador. Há diversos fatores que influenciam no comportamento do consumidor e, em função disso, prever para quantidades cada vez menores de tempo pode gerar previsões mais acuradas, devido à alta volatilidade dos dados. Ao passo que, pode ser um tanto complicado no que se refere à menor quantidade do set de treinamento e a uma falta de tendência clara nos dados.
+
 ## Referências 
 
-[1]. 
+[1]. Peixeiro, M. (2022). Time Series Forecasting in Python. Shelter Island, NY: Manning Publications.
 
-[2]. 
+[2]. https://www.statsmodels.org/dev/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html
 
-[3].
-
-[4]. 
-
+[3]. https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html
