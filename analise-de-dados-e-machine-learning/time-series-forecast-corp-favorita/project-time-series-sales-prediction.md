@@ -25,7 +25,7 @@ https://www.kaggle.com/competitions/favorita-grocery-sales-forecasting/data
 ### Modelos utilizados
 Foram utilizados os modelos **ARIMA** e **SARIMAX**.
 
-O notebook com o código completo do projeto se encontra em: 
+O notebook com o código completo do projeto se encontra em: https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/time-series-forecast-corp-favorita/corp_fav_forecast.ipynb
 
 ## 1. Análise exploratória dos dados 
 <p align="justify"> Os dados fornecidos possuem quatro datasets a serem explorados: <strong> sales_df, stores_df, oil_df e holidays_df </strong>.
@@ -131,7 +131,7 @@ O proxímo passo é escolher um modelo que gere o menor AIC a partir dos parâme
 
 <p align="justify"> O AIC (Akaike Information Criterion) é uma métrica utilizada para comparar diferentes modelos estatísticos e determinar qual deles apresenta o melhor equilíbrio entre ajuste aos dados e complexidade do modelo. O AIC é baseado na ideia de que um bom modelo deve fornecer um bom ajuste mas também deve ser o mais parcimonioso possível, ou seja, não deve ser excessivamente complexo. Quanto menor o valor do AIC, melhor é o modelo, indicando um bom ajuste aos dados com menor complexidade.</p>
 
-<p align="justify"> Usaremos uma função para treinar um modelo ARIMA com diferentes valores de p e q, parâmetros do ARIMA, a fim de visualizar qual que gera o menor AIC. </p>
+<p align="justify"> Usaremos uma função para treinar um modelo ARIMA com diferentes valores de p e q, parâmetros do ARIMA, a fim de saber quais que geram o menor AIC. </p>
 
 O dataframe abaixo nos mostra o resultado
 
