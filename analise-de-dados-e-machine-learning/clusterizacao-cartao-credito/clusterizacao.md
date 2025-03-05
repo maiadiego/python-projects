@@ -44,9 +44,17 @@ O dataset possui 18 variáveis ​​comportamentais por parte dos clientes quan
 ### Aplicação do Algoritmo de Clusterização
 
 <p align="justify"> O algoritmo utilizado nessa etapa foi o K-Means. Após rodadas de teste, o número de clusters que dividiria o conjunto de dados foi pré-definido como 3. </p>
-<p align="justify"> Em função da alta quantidade de variáveis do conjunto, foi aplicado o algoritmo PCA para reduzir as variáveis a dois componentes principais, possibilitando a visualização dos agrupamentos em duas dimensões, como mostra a figura a seguir: </p>
+<p align="justify"> Em função da alta quantidade de variáveis do conjunto, foi aplicado o algoritmo Kernel PCA para reduzir as variáveis a dois componentes principais, possibilitando a visualização dos agrupamentos em duas dimensões, como mostra a figura a seguir: </p>
 
 ![pca](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/clusterizacao-cartao-credito/img/kernel-pca.png) 
+
+<p align="justify"> Esses dois componentes são responsáveis por explicar grande parte da variação nos dados. </p>
+
+### Análise Estatística dos Clusters
+
+Após a formação dos agrupamentos, foi realizada uma análise descritiva utilizando boxplots e gráficos de densidade considerando todas as variáveis de cada cluster. Análise foi focada no quartis do gráfico boxplot a fim de identificar as semelhanças e diferenças nas características dos clientes presentes em cada cluster.
+
+#### Cluster 0
 
 
 
