@@ -50,11 +50,11 @@ O dataset possui 18 variáveis ​​comportamentais por parte dos clientes quan
 
 <p align="justify"> Esses dois componentes são responsáveis por explicar grande parte da variação nos dados. </p>
 
-### Análise Estatística dos Clusters
+### Mapeamento dos Perfis de Clientes
 
 Após a formação dos agrupamentos, foi realizada uma análise descritiva utilizando boxplots e gráficos de densidade considerando todas as variáveis de cada cluster. Análise foi focada no quartis do gráfico boxplot a fim de identificar as semelhanças e diferenças nas características dos clientes presentes em cada cluster.
 
-#### Cluster 0
+#### Cluster 0 – Cliente Moderado (Perfil Intermediário)
 
 
 
