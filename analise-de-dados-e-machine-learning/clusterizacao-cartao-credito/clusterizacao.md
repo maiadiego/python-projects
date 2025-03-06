@@ -116,24 +116,35 @@ O filtro realizado apontou **330 clientes de alto valor (onde 92% pertencem ao C
 Para os **Clientes de Alto Valor**:
 
 🔹 Oferecer programas de recompensas exclusivos e personalizados (cashback, milhas, parcerias premium).
+
 🔹 Disponibilizar atendimento prioritário e benefícios exclusivos (sala VIP, concierge, seguro viagem).
+
 🔹 Ampliar limite de crédito de forma estratégica para incentivar mais compras.
+
 🔹 Criar ofertas personalizadas baseadas no comportamento de consumo (ex: descontos em categorias de maior interesse).
 
 Para os **Clientes com Risco de Inadimplência**:
 
 🔹 Oferecer planos de renegociação com parcelamento da fatura em condições acessíveis.
+
 🔹 Enviar notificações sobre impacto de juros e importância de pagar o valor total.
+
 🔹 Criar alertas proativos para lembrar do vencimento da fatura e sugerir pagamentos parciais antes do fechamento.
+
 🔹 Oferecer benefícios para pagamentos em dia, como redução temporária de juros ou cashback na fatura.
+
 🔹 Monitorar comportamento e reduzir gradualmente o limite caso o risco aumente.
 
 Para os **Clientes com Risco de Cancelamento**:
 
 🔹 Criar ofertas personalizadas baseadas em histórico de compras e interesses (ex: cupons de desconto para primeiras compras).
+
 🔹 Reduzir ou eliminar taxas de anuidade para incentivar o uso contínuo.
+
 🔹 Enviar comunicações direcionadas mostrando os benefícios do cartão que o cliente não está utilizando.
+
 🔹 Oferecer incentivos para uso do cartão, como cashback na primeira compra após um período sem uso.
+
 🔹 Criar campanhas de ativação, como sorteios e desafios de gastos para desbloquear recompensas.
 
 
