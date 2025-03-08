@@ -1,4 +1,6 @@
 ## Segmentação de Clientes de Cartão de Crédito para Otimização de Estratégias Financeiras
+Notebook do projeto: https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/clusterizacao-cartao-credito/clusterizacao_cartao_credito.ipynb
+
 ### Problema de negócio
 <p align="justify"> A análise do comportamento de uso do cartão de crédito de aproximadamente 9.000 clientes ativos nos últimos seis meses revelou três perfis distintos de consumidores. Esses perfis foram identificados por meio de técnicas de segmentação de dados, permitindo uma compreensão mais profunda dos hábitos de consumo, padrões de pagamento e uso de crédito. O desafio do negócio consiste em utilizar esses insights para desenvolver estratégias personalizadas que maximizem a rentabilidade, reduzam riscos de inadimplência e aumentem a fidelização dos clientes, equilibrando a oferta de crédito com práticas sustentáveis para a instituição financeira.</p>
 
@@ -43,7 +45,7 @@ O dataset possui 18 variáveis ​​comportamentais por parte dos clientes quan
 
 ### Aplicação do Algoritmo de Clusterização
 
-<p align="justify"> O algoritmo utilizado nessa etapa foi o K-Means. Após rodadas de teste, o número de clusters que dividiria o conjunto de dados foi pré-definido como 3. </p>
+<p align="justify"> O algoritmo utilizado nessa etapa foi o K-Means. Após rodadas de teste, o número de clusters que divide o conjunto de dados foi pré-definido como 3. </p>
 <p align="justify"> Em função da alta quantidade de variáveis do conjunto, foi aplicado o algoritmo Kernel PCA para reduzir as variáveis a dois componentes principais, possibilitando a visualização dos agrupamentos em duas dimensões, como mostra a figura a seguir: </p>
 
 ![pca](https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/clusterizacao-cartao-credito/img/kernel-pca.png) 
@@ -52,7 +54,7 @@ O dataset possui 18 variáveis ​​comportamentais por parte dos clientes quan
 
 ### Mapeamento dos Perfis de Clientes
 
-Após a formação dos agrupamentos, foi realizada uma análise descritiva utilizando boxplots e gráficos de densidade considerando todas as variáveis de cada cluster. Análise foi focada no quartis do gráfico boxplot com o intuito de identificar as semelhanças e diferenças nas características dos clientes presentes em contidos nos clusters.
+Após a formação dos agrupamentos, foi realizada uma análise descritiva utilizando boxplots e gráficos de densidade considerando todas as variáveis de cada cluster. A análise foi focada no quartis do gráfico boxplot com o intuito de identificar as semelhanças e diferenças nas características dos clientes contidos nos clusters.
 
 #### Cluster 0 – Cliente Moderado (Perfil Intermediário)
 
@@ -103,13 +105,13 @@ Após a formação dos agrupamentos, foi realizada uma análise descritiva utili
 - Promoções de alta exclusividade: Convites para eventos, descontos especiais e benefícios para compras acima de determinado valor.
 - Pagamentos programados: Opções para facilitar a quitação da fatura, evitando inadimplência.
 
-Cada cluster possui clientes com valores extremos que se distanciam do comportamento padrão dos outros clientes do cluster. Por conta disso, foi realizada uma filtragem da amostra geral com o objetivo de capturar clientes estratégicos, como **Clientes de Alto Valor**, **Clientes com Risco de Inadimplência** e **Clientes com Risco de Cancelamento**.
+Cada cluster possui clientes cujo as variáveis de comportamento possuem valores extremos que destoam do comportamento padrão da maior parte. Por conta disso, foi realizada uma filtragem da amostra geral com o objetivo de capturar clientes estratégicos, como **Clientes de Alto Valor**, **Clientes com Risco de Inadimplência** e **Clientes com Risco de Cancelamento**.
 
 * **Clientes de Alto Valor** <p align="justify"> Alto nível e frequência de compras, não realizam saques emergenciais e possuem um bom limite.</p>
 * **Clientes com Risco de Inadimplência** <p align="justify"> Usa muito adiantamento em dinheiro (indicador de emergência financeira), nunca paga a fatura integral e paga apenas o mínimo, mas valores altos</p>
 * **Clientes com Risco de Cancelamento** <p align="justify"> Nível e frequência de compras baixo, limite alto mas não usa, tem muito saldo disponível, tem bastante tempo de posse do cartão mas sem engajamento.</p>
 
-O filtro realizado apontou **330 clientes de alto valor (onde 92% pertencem ao Cluster 2)**, **632 clientes com risco de inadimplência (onde 90% pertencem ao Cluster 0)** e **237 com risco de cancelamento (onde 96% também pertencem ao Cluster 0)**. Portanto, o Cluster 0, em razão da sua alta diversidade de clientes, precisa de um pouco mais de atenção.
+O filtro realizado apontou **330 clientes de alto valor (onde 92% pertencem ao Cluster 2)**, **632 clientes com risco de inadimplência (onde 90% pertencem ao Cluster 0)** e **237 com risco de cancelamento (onde 96% também pertencem ao Cluster 0)**. Portanto, o Cluster 0, em razão da sua alta diversidade de características dos clientes, necessita de um pouco mais de atenção.
 
 ### Ações a serem Tomadas
 
