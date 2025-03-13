@@ -11,7 +11,7 @@ def carregar_dados():
     # Carregar dataset 
     df = pd.read_csv(os.path.join(os.path.dirname(__file__), "dados_clientes.csv"))
     # Carregar modelo treinado
-    kmeans = joblib.load("modelo_cluster.pkl")
+    kmeans = joblib.load(os.path.join(os.path.dirname(__file__), "modelo_cluster.pkl"))
 
     mapeamento_colunas = {
         'CUST_ID': 'CLIENTE_ID',
