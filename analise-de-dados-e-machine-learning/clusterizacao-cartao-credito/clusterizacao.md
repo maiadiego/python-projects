@@ -1,5 +1,7 @@
 ## Segmentação de Clientes de Cartão de Crédito para Otimização de Estratégias Financeiras
-Notebook do projeto: https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/clusterizacao-cartao-credito/clusterizacao_cartao_credito.ipynb
+App Interativo do Projeto: https://creditcardclustering.streamlit.app/
+
+Notebook do Projeto: https://github.com/maiadiego/python-projects/blob/master/analise-de-dados-e-machine-learning/clusterizacao-cartao-credito/clusterizacao_cartao_credito.ipynb
 
 ### Problema de negócio
 <p align="justify"> A análise do comportamento de uso do cartão de crédito de aproximadamente 9.000 clientes ativos nos últimos seis meses revelou três perfis distintos de consumidores. Esses perfis foram identificados por meio de técnicas de segmentação de dados, permitindo uma compreensão mais profunda dos hábitos de consumo, padrões de pagamento e uso de crédito. O desafio do negócio consiste em utilizar esses insights para desenvolver estratégias personalizadas que maximizem a rentabilidade, reduzam riscos de inadimplência e aumentem a fidelização dos clientes, equilibrando a oferta de crédito com práticas sustentáveis para a instituição financeira.</p>
