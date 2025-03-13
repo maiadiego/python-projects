@@ -9,7 +9,7 @@ import plotly.express as px
 
 def carregar_dados():
     # Carregar dataset 
-    df = pd.read_csv("dados_clientes.csv")
+    df = pd.read_csv("deploy-streamlit/dados_clientes.csv")
     # Carregar modelo treinado
     kmeans = joblib.load("modelo_cluster.pkl")
 
