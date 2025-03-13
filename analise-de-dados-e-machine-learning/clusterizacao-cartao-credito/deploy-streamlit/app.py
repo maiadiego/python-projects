@@ -4,12 +4,12 @@ import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import KernelPCA
 import plotly.express as px
-
+import os
 
 
 def carregar_dados():
     # Carregar dataset 
-    df = pd.read_csv("deploy-streamlit/dados_clientes.csv")
+    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "dados_clientes.csv"))
     # Carregar modelo treinado
     kmeans = joblib.load("modelo_cluster.pkl")
 
